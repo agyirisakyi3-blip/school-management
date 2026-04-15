@@ -1,0 +1,1 @@
+web: gunicorn school.wsgi --worker-tmp-dir /dev/shm

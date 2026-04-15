@@ -1,0 +1,752 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Control Panel - School Management System{% endblock %}
+{% block page_title %}Admin Control Panel{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-hero {
+        background: linear-gradient(135deg, #1e1b4b 0%, #4f46e5 50%, #7c3aed 100%);
+        border-radius: 1.25rem;
+        padding: 2rem 2.5rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    .admin-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 50%;
+    }
+    .admin-hero::after {
+        content: '';
+        position: absolute;
+        bottom: -30%;
+        left: 30%;
+        width: 250px;
+        height: 250px;
+        background: rgba(255,255,255,0.03);
+        border-radius: 50%;
+    }
+    .admin-hero h2 { font-weight: 800; letter-spacing: -0.5px; }
+    .admin-hero .badge { font-size: 0.75rem; padding: 0.5em 1em; }
+
+    /* Module Cards */
+    .module-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid #f0f0f5;
+        position: relative;
+        overflow: hidden;
+    }
+    .module-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+        color: inherit;
+        border-color: transparent;
+    }
+    .module-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 4px;
+        border-radius: 1rem 1rem 0 0;
+        transition: height 0.3s;
+    }
+    .module-card:hover::before { height: 6px; }
+    .module-card.mod-students::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+    .module-card.mod-teachers::before { background: linear-gradient(90deg, #059669, #34d399); }
+    .module-card.mod-academics::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+    .module-card.mod-finance::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+    .module-card.mod-communication::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+    .module-card.mod-library::before { background: linear-gradient(90deg, #06b6d4, #67e8f9); }
+    .module-card.mod-transport::before { background: linear-gradient(90deg, #ec4899, #f472b6); }
+    .module-card.mod-dormitory::before { background: linear-gradient(90deg, #14b8a6, #5eead4); }
+    .module-card.mod-leaves::before { background: linear-gradient(90deg, #f97316, #fb923c); }
+    .module-card.mod-frontdesk::before { background: linear-gradient(90deg, #6366f1, #818cf8); }
+    .module-card.mod-homework::before { background: linear-gradient(90deg, #84cc16, #a3e635); }
+    .module-card.mod-settings::before { background: linear-gradient(90deg, #64748b, #94a3b8); }
+
+    .module-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    .module-card .module-value {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #111827;
+        line-height: 1;
+    }
+    .module-card .module-label {
+        font-size: 0.8rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+    }
+    .module-card .module-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-top: 0.5rem;
+    }
+    .module-card .module-desc {
+        font-size: 0.82rem;
+        color: #9ca3af;
+        margin-top: 0.25rem;
+    }
+
+    /* User Distribution */
+    .user-dist-bar {
+        height: 10px;
+        border-radius: 5px;
+        background: #f3f4f6;
+        overflow: hidden;
+        display: flex;
+    }
+    .user-dist-bar .segment {
+        height: 100%;
+        transition: width 0.6s ease;
+    }
+    .user-dist-bar .seg-admin { background: linear-gradient(90deg, #ef4444, #f87171); }
+    .user-dist-bar .seg-teacher { background: linear-gradient(90deg, #059669, #34d399); }
+    .user-dist-bar .seg-student { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+    .user-dist-bar .seg-parent { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+
+    .legend-dot {
+        width: 10px; height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 6px;
+    }
+
+    /* Activity Timeline */
+    .activity-timeline .activity-entry {
+        display: flex;
+        gap: 1rem;
+        padding: 0.875rem 0;
+        border-bottom: 1px solid #f3f4f6;
+        transition: background 0.2s;
+    }
+    .activity-timeline .activity-entry:last-child { border-bottom: none; }
+    .activity-timeline .activity-entry:hover { background: #fafafe; }
+    .activity-dot {
+        width: 36px; height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+    .dot-create { background: rgba(5,150,105,0.1); color: #059669; }
+    .dot-update { background: rgba(59,130,246,0.1); color: #3b82f6; }
+    .dot-delete { background: rgba(239,68,68,0.1); color: #ef4444; }
+    .dot-login { background: rgba(139,92,246,0.1); color: #8b5cf6; }
+    .dot-logout { background: rgba(107,114,128,0.1); color: #6b7280; }
+    .dot-other { background: rgba(249,115,22,0.1); color: #f97316; }
+
+    /* Section Headers */
+    .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.25rem;
+    }
+    .section-header h5 {
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0;
+    }
+
+    /* Admin Quick Stats Row */
+    .admin-stat {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.25rem 1.5rem;
+        border: 1px solid #f0f0f5;
+        transition: all 0.2s;
+    }
+    .admin-stat:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+    .admin-stat .stat-num {
+        font-size: 2rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1;
+    }
+    .admin-stat .stat-text {
+        font-size: 0.82rem;
+        color: #6b7280;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    /* Pulse animation for live indicator */
+    .live-dot {
+        width: 8px; height: 8px;
+        background: #22c55e;
+        border-radius: 50%;
+        display: inline-block;
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.5; transform: scale(1.3); }
+    }
+
+    .card-glass {
+        background: rgba(255,255,255,0.95);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.3);
+    }
+
+    /* Distribution Bar Variables */
+    .user-dist-bar {
+        --admin-pct: {% widthratio admin_count total_users 100 %}%;
+        --teacher-pct: {% widthratio teacher_count total_users 100 %}%;
+        --student-pct: {% widthratio student_count total_users 100 %}%;
+        --parent-pct: {% widthratio parent_count total_users 100 %}%;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Admin Hero Banner -->
+<div class="admin-hero">
+    <div class="row align-items-center">
+        <div class="col-lg-8">
+            <div class="d-flex align-items-center gap-3 mb-2">
+                <h2 class="mb-0">Admin Control Panel</h2>
+                <span class="badge bg-white bg-opacity-25"><span class="live-dot me-1"></span> Live</span>
+            </div>
+            <p class="mb-0 opacity-75 mw-600">
+                Full control over all school operations. Manage users, academics, finances, and system settings from a single command center.
+            </p>
+        </div>
+        <div class="col-lg-4 text-end d-none d-lg-block">
+            <a href="{% url 'users:user_management' %}" class="btn btn-light btn-lg me-2">
+                <i class="bi bi-people me-1"></i> Manage Users
+            </a>
+            <a href="{% url 'users:activity_logs' %}" class="btn btn-outline-light btn-lg">
+                <i class="bi bi-clock-history me-1"></i> Logs
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats Row -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="admin-stat text-center">
+            <div class="stat-num">{{ total_users|default:"0" }}</div>
+            <div class="stat-text">Total Users</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="admin-stat text-center">
+            <div class="stat-num">{{ total_students|default:"0" }}</div>
+            <div class="stat-text">Students</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="admin-stat text-center">
+            <div class="stat-num">{{ total_teachers|default:"0" }}</div>
+            <div class="stat-text">Teachers</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="admin-stat text-center">
+            <div class="stat-num">{{ total_classes|default:"0" }}</div>
+            <div class="stat-text">Classes</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="admin-stat text-center">
+            <div class="stat-num">${{ monthly_collections|default:"0"|floatformat:0 }}</div>
+            <div class="stat-text">Revenue</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <div class="admin-stat text-center">
+            <div class="stat-num">{{ pending_fees|default:"0" }}</div>
+            <div class="stat-text">Pending Fees</div>
+        </div>
+    </div>
+</div>
+
+<!-- User Distribution & Operations Modules -->
+<div class="row g-4 mb-4">
+    <!-- User Distribution -->
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white py-3">
+                <div class="section-header mb-0">
+                    <h5><i class="bi bi-pie-chart me-2 text-primary"></i>User Distribution</h5>
+                    <a href="{% url 'users:user_management' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="user-dist-bar mb-3">
+                    <div class="segment seg-admin h-admin-pct"></div>
+                    <div class="segment seg-teacher h-teacher-pct"></div>
+                    <div class="segment seg-student h-student-pct"></div>
+                    <div class="segment seg-parent h-parent-pct"></div>
+                </div>
+                <div class="row g-3 mt-2">
+                    <div class="col-6">
+                        <div class="d-flex align-items-center">
+                            <span class="legend-dot seg-admin"></span>
+                            <span class="small text-muted">Admins</span>
+                            <span class="ms-auto fw-bold">{{ admin_count }}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center">
+                            <span class="legend-dot seg-teacher"></span>
+                            <span class="small text-muted">Teachers</span>
+                            <span class="ms-auto fw-bold">{{ teacher_count }}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center">
+                            <span class="legend-dot seg-student"></span>
+                            <span class="small text-muted">Students</span>
+                            <span class="ms-auto fw-bold">{{ student_count }}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="d-flex align-items-center">
+                            <span class="legend-dot seg-parent"></span>
+                            <span class="small text-muted">Parents</span>
+                            <span class="ms-auto fw-bold">{{ parent_count }}</span>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="fw-bold text-success">{{ active_users }}</div>
+                        <small class="text-muted">Active</small>
+                    </div>
+                    <div class="col-6">
+                        <div class="fw-bold text-danger">{{ inactive_users }}</div>
+                        <small class="text-muted">Inactive</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick User Actions -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white py-3">
+                <div class="section-header mb-0">
+                    <h5><i class="bi bi-lightning-charge me-2 text-warning"></i>Quick Actions</h5>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'users:user_create' %}" class="quick-action">
+                            <div class="quick-action-icon bg-primary bg-opacity-10 text-primary"><i class="bi bi-person-plus-fill"></i></div>
+                            <h6 class="mb-1">Add User</h6>
+                            <small class="text-muted">Any role</small>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'students:student_create' %}" class="quick-action">
+                            <div class="quick-action-icon bg-success bg-opacity-10 text-success"><i class="bi bi-mortarboard-fill"></i></div>
+                            <h6 class="mb-1">Add Student</h6>
+                            <small class="text-muted">Admission</small>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'teachers:teacher_create' %}" class="quick-action">
+                            <div class="quick-action-icon bg-info bg-opacity-10 text-info"><i class="bi bi-person-badge-fill"></i></div>
+                            <h6 class="mb-1">Add Teacher</h6>
+                            <small class="text-muted">New staff</small>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'communication:announcement_create' %}" class="quick-action">
+                            <div class="quick-action-icon bg-danger bg-opacity-10 text-danger"><i class="bi bi-megaphone-fill"></i></div>
+                            <h6 class="mb-1">Announce</h6>
+                            <small class="text-muted">Send notice</small>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'finance:payment_create' %}" class="quick-action">
+                            <div class="quick-action-icon bg-warning bg-opacity-10 text-warning"><i class="bi bi-credit-card-fill"></i></div>
+                            <h6 class="mb-1">Record Pay</h6>
+                            <small class="text-muted">Collect fee</small>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'academics:attendance_bulk_create' %}" class="quick-action">
+                            <div class="quick-action-icon bg-success bg-opacity-10 text-success"><i class="bi bi-calendar-check-fill"></i></div>
+                            <h6 class="mb-1">Attendance</h6>
+                            <small class="text-muted">Daily roll</small>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'finance:assign_fees' %}" class="quick-action">
+                            <div class="quick-action-icon bg-primary bg-opacity-10 text-primary"><i class="bi bi-cash-stack"></i></div>
+                            <h6 class="mb-1">Assign Fees</h6>
+                            <small class="text-muted">Generate</small>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'settings:dashboard' %}" class="quick-action">
+                            <div class="quick-action-icon bg-secondary bg-opacity-10 text-secondary"><i class="bi bi-gear-fill"></i></div>
+                            <h6 class="mb-1">Settings</h6>
+                            <small class="text-muted">Configure</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- All Modules Grid -->
+<div class="section-header">
+    <h5><i class="bi bi-grid-3x3-gap me-2 text-primary"></i>School Operations</h5>
+    <span class="text-muted small">Full control over every module</span>
+</div>
+<div class="row g-3 mb-4">
+    <!-- Students -->
+    <div class="col-6 col-md-4 col-xl-3">
+        <a href="{% url 'students:student_list' %}" class="module-card mod-students">
+            <div class="module-icon icon-bg-blue"><i class="bi bi-people-fill"></i></div>
+            <div class="module-value">{{ total_students|default:"0" }}</div>
+            <div class="module-label">Active Students</div>
+            <div class="module-title">Student Management</div>
+            <div class="module-desc">Admissions, profiles & records</div>
+        </a>
+    </div>
+    <!-- Teachers -->
+    <div class="col-6 col-md-4 col-xl-3">
+        <a href="{% url 'teachers:teacher_list' %}" class="module-card mod-teachers">
+            <div class="module-icon icon-bg-green"><i class="bi bi-person-badge-fill"></i></div>
+            <div class="module-value">{{ total_teachers|default:"0" }}</div>
+            <div class="module-label">Active Teachers</div>
+            <div class="module-title">Teacher Management</div>
+            <div class="module-desc">Staff, subjects & assignments</div>
+        </a>
+    </div>
+    <!-- Classes -->
+    <div class="col-6 col-md-4 col-xl-3">
+        <a href="{% url 'students:class_list' %}" class="module-card mod-academics">
+            <div class="module-icon icon-bg-purple"><i class="bi bi-collection-fill"></i></div>
+            <div class="module-value">{{ total_classes|default:"0" }}</div>
+            <div class="module-label">Classes</div>
+            <div class="module-title">Class Management</div>
+            <div class="module-desc">Grades, sections & timetables</div>
+        </a>
+    </div>
+    <!-- Finance -->
+    <div class="col-6 col-md-4 col-xl-3">
+        <a href="{% url 'finance:payment_list' %}" class="module-card mod-finance">
+            <div class="module-icon icon-bg-amber"><i class="bi bi-cash-coin"></i></div>
+            <div class="module-value">${{ total_fees_collected|default:"0"|floatformat:0 }}</div>
+            <div class="module-label">Collected</div>
+            <div class="module-title">Finance & Fees</div>
+            <div class="module-desc">Payments, expenses & invoices</div>
+        </a>
+    </div>
+    <!-- Exams -->
+    <div class="col-6 col-md-4 col-xl-3">
+        <a href="{% url 'academics:exam_list' %}" class="module-card mod-academics">
+            <div class="module-icon icon-bg-purple"><i class="bi bi-file-earmark-text-fill"></i></div>
+            <div class="module-value">{{ total_exams|default:"0" }}</div>
+            <div class="module-label">Active Exams</div>
+            <div class="module-title">Examinations</div>
+            <div class="module-desc">Exams, schedules & results</div>
+        </a>
+    </div>
+    <!-- Attendance -->
+    <div class="col-6 col-md-4 col-xl-3">
+        <a href="{% url 'academics:attendance_list' %}" class="module-card mod-communication">
+            <div class="module-icon icon-bg-red"><i class="bi bi-calendar-check-fill"></i></div>
+            <div class="module-value">{{ today_attendance|default:"0" }}</div>
+            <div class="module-label">Today</div>
+            <div class="module-title">Attendance</div>
+            <div class="module-desc">Daily tracking & reports</div>
+        </a>
+    </div>
+    <!-- Library -->
+    <div class="col-6 col-md-4 col-xl-3">
+        <a href="{% url 'library:book_list' %}" class="module-card mod-library">
+            <div class="module-icon icon-bg-cyan"><i class="bi bi-book-fill"></i></div>
+            <div class="module-value">{{ total_books|default:"0" }}</div>
+            <div class="module-label">Books</div>
+            <div class="module-title">Library</div>
+            <div class="module-desc">Books, issues & members</div>
+        </a>
+    </div>
+    <!-- Transport -->
+    <div class="col-6 col-md-4 col-xl-3">
+        <a href="{% url 'transport:dashboard' %}" class="module-card mod-transport">
+            <div class="module-icon icon-bg-pink"><i class="bi bi-truck"></i></div>
+            <div class="module-value">{{ total_routes|default:"0" }}</div>
+            <div class="module-label">Routes</div>
+            <div class="module-title">Transport</div>
+            <div class="module-desc">Vehicles, routes & drivers</div>
+        </a>
+    </div>
+    <!-- Dormitory -->
+    <div class="col-6 col-md-4 col-xl-3">
+        <a href="{% url 'dormitory:dashboard' %}" class="module-card mod-dormitory">
+            <div class="module-icon icon-bg-teal"><i class="bi bi-house-door-fill"></i></div>
+            <div class="module-value">{{ total_rooms|default:"0" }}</div>
+            <div class="module-label">Rooms</div>
+            <div class="module-title">Dormitory</div>
+            <div class="module-desc">Rooms, beds & allocations</div>
+        </a>
+    </div>
+    <!-- Leave -->
+    <div class="col-6 col-md-4 col-xl-3">
+        <a href="{% url 'leaves:dashboard' %}" class="module-card mod-leaves">
+            <div class="module-icon icon-bg-orange"><i class="bi bi-calendar-minus-fill"></i></div>
+            <div class="module-value">{{ pending_leaves|default:"0" }}</div>
+            <div class="module-label">Pending</div>
+            <div class="module-title">Leave Management</div>
+            <div class="module-desc">Applications & approvals</div>
+        </a>
+    </div>
+    <!-- Front Office -->
+    <div class="col-6 col-md-4 col-xl-3">
+        <a href="{% url 'frontdesk:dashboard' %}" class="module-card mod-frontdesk">
+            <div class="module-icon icon-bg-indigo"><i class="bi bi-building"></i></div>
+            <div class="module-value">{{ today_visitors|default:"0" }}</div>
+            <div class="module-label">Visitors Today</div>
+            <div class="module-title">Front Office</div>
+            <div class="module-desc">Visitors, calls & mail</div>
+        </a>
+    </div>
+    <!-- Communication -->
+    <div class="col-6 col-md-4 col-xl-3">
+        <a href="{% url 'communication:announcement_list' %}" class="module-card mod-communication">
+            <div class="module-icon icon-bg-red"><i class="bi bi-megaphone-fill"></i></div>
+            <div class="module-value">{{ total_announcements|default:"0" }}</div>
+            <div class="module-label">Announcements</div>
+            <div class="module-title">Communication</div>
+            <div class="module-desc">Notices, messages & alerts</div>
+        </a>
+    </div>
+</div>
+
+<!-- Activity Log & Recent Users -->
+<div class="row g-4 mb-4">
+    <!-- Activity Log -->
+    <div class="col-lg-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <div class="section-header mb-0">
+                    <h5><i class="bi bi-clock-history me-2 text-primary"></i>Recent Activity</h5>
+                    <a href="{% url 'users:activity_logs' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="activity-timeline px-3">
+                    {% if recent_activities %}
+                        {% for activity in recent_activities %}
+                        <div class="activity-entry">
+                            <div class="activity-dot dot-{{ activity.action }}">
+                                {% if activity.action == "create" %}
+                                    <i class="bi bi-plus-lg"></i>
+                                {% elif activity.action == "update" %}
+                                    <i class="bi bi-pencil"></i>
+                                {% elif activity.action == "delete" %}
+                                    <i class="bi bi-trash"></i>
+                                {% elif activity.action == "login" %}
+                                    <i class="bi bi-box-arrow-in-right"></i>
+                                {% elif activity.action == "logout" %}
+                                    <i class="bi bi-box-arrow-right"></i>
+                                {% else %}
+                                    <i class="bi bi-circle"></i>
+                                {% endif %}
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <span class="fw-semibold">{{ activity.user.get_full_name|default:"System" }}</span>
+                                        <span class="badge bg-light text-dark ms-1 fs-07">{{ activity.get_action_display }}</span>
+                                    </div>
+                                    <small class="text-muted">{{ activity.created_at|timesince }} ago</small>
+                                </div>
+                                <p class="mb-0 text-muted small">{{ activity.description|truncatechars:80 }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="p-4 text-center text-muted">
+                            <i class="bi bi-clock-history fs-1 d-block mb-2 opacity-50"></i>
+                            <p class="mb-0">No activity recorded yet</p>
+                            <small>Actions will appear here as they happen</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Users -->
+    <div class="col-lg-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <div class="section-header mb-0">
+                    <h5><i class="bi bi-person-plus me-2 text-success"></i>Recent Users</h5>
+                    <a href="{% url 'users:user_management' %}" class="btn btn-sm btn-outline-success">Manage</a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_users %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 py-3 ps-3">User</th>
+                                <th class="border-0 py-3">Role</th>
+                                <th class="border-0 py-3">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in recent_users %}
+                            <tr>
+                                <td class="ps-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle-sm me-2 avatar-role-{{ u.role }}">
+                                            {{ u.first_name|make_list|first|upper|default:"?" }}
+                                        </div>
+                                        <div>
+                                            <div class="fw-semibold fs-088">{{ u.get_full_name|truncatechars:20 }}</div>
+                                            <small class="text-muted">{{ u.email|truncatechars:22 }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge {% if u.role == 'admin' %}bg-danger{% elif u.role == 'teacher' %}bg-success{% elif u.role == 'student' %}bg-primary{% else %}bg-warning text-dark{% endif %} fs-072">
+                                        {{ u.get_role_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if u.is_active %}
+                                    <span class="badge bg-success bg-opacity-10 text-success fs-072">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-danger bg-opacity-10 text-danger fs-072">Inactive</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-4 text-center text-muted">
+                    <i class="bi bi-people fs-1 d-block mb-2 opacity-50"></i>
+                    <p class="mb-0">No users yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Monthly Growth -->
+        <div class="card border-0 shadow-sm mt-3">
+            <div class="card-body">
+                <h6 class="fw-bold mb-3"><i class="bi bi-graph-up-arrow me-2 text-primary"></i>This Month</h6>
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="fw-bold fs-5 text-primary">{{ new_students_month|default:"0" }}</div>
+                        <small class="text-muted">New Students</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold fs-5 text-success">{{ new_teachers_month|default:"0" }}</div>
+                        <small class="text-muted">New Teachers</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold fs-5 text-warning">${{ monthly_expenses|default:"0"|floatformat:0 }}</div>
+                        <small class="text-muted">Expenses</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Settings & Configuration -->
+<div class="section-header">
+    <h5><i class="bi bi-gear me-2 text-secondary"></i>System Configuration</h5>
+</div>
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-xl-2">
+        <a href="{% url 'settings:school_info' %}" class="module-card mod-settings">
+            <div class="module-icon icon-bg-slate"><i class="bi bi-building"></i></div>
+            <div class="module-title">School Info</div>
+            <div class="module-desc">Name, logo & details</div>
+        </a>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <a href="{% url 'settings:general_settings' %}" class="module-card mod-settings">
+            <div class="module-icon icon-bg-slate"><i class="bi bi-sliders"></i></div>
+            <div class="module-title">General</div>
+            <div class="module-desc">Currency & formats</div>
+        </a>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <a href="{% url 'settings:email_settings' %}" class="module-card mod-settings">
+            <div class="module-icon icon-bg-slate"><i class="bi bi-envelope"></i></div>
+            <div class="module-title">Email</div>
+            <div class="module-desc">SMTP & templates</div>
+        </a>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <a href="{% url 'settings:theme_settings' %}" class="module-card mod-settings">
+            <div class="module-icon icon-bg-slate"><i class="bi bi-palette"></i></div>
+            <div class="module-title">Theme</div>
+            <div class="module-desc">Colors & layout</div>
+        </a>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <a href="{% url 'settings:fee_settings' %}" class="module-card mod-settings">
+            <div class="module-icon icon-bg-slate"><i class="bi bi-cash"></i></div>
+            <div class="module-title">Fee Config</div>
+            <div class="module-desc">Payment rules</div>
+        </a>
+    </div>
+    <div class="col-6 col-md-4 col-xl-2">
+        <a href="{% url 'settings:result_settings' %}" class="module-card mod-settings">
+            <div class="module-icon icon-bg-slate"><i class="bi bi-clipboard-data"></i></div>
+            <div class="module-title">Results</div>
+            <div class="module-desc">Grading system</div>
+        </a>
+    </div>
+</div>
+{% endblock %}

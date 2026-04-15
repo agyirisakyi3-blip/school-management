@@ -1,0 +1,90 @@
+{% extends 'settings/dashboard.html' %}
+{% load crispy_forms_tags %}
+
+{% block settings_content %}
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-0"><i class="bi bi-calendar-check text-danger me-2"></i>Attendance Settings</h5>
+                <p class="text-muted small mb-0">Configure attendance rules and policies</p>
+            </div>
+            <a href="{% url 'settings:dashboard' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Back
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h6 class="text-muted mb-3"><i class="bi bi-exclamation-triangle me-2"></i>Absence Rules</h6>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small text-muted fw-bold">Auto-Absent Threshold</label>
+                    {{ form.auto_absent_threshold }}
+                    <div class="form-text">Days of consecutive absence before auto-marking as absent</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small text-muted fw-bold">Required Attendance %</label>
+                    {{ form.attendance_percentage_required }}
+                    <div class="form-text">Minimum attendance percentage required for promotion</div>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h6 class="text-muted mb-3"><i class="bi bi-pencil-square me-2"></i>Editing Permissions</h6>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check form-switch mb-3">
+                        {{ form.allow_attendance_edit }}
+                        <label class="form-check-label" for="{{ form.allow_attendance_edit.id_for_label }}">
+                            <strong>Allow Attendance Editing</strong>
+                            <small class="text-muted d-block">Teachers can edit attendance records</small>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small text-muted fw-bold">Edit Days Limit</label>
+                    {{ form.attendance_edit_days_limit }}
+                    <div class="form-text">Days limit for editing (0 = no limit)</div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="form-check form-switch mb-3">
+                        {{ form.require_attendance_remark }}
+                        <label class="form-check-label" for="{{ form.require_attendance_remark.id_for_label }}">
+                            <strong>Require Remark</strong>
+                            <small class="text-muted d-block">Teachers must add remarks for each entry</small>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-circle me-2"></i>
+                <strong>Attendance Policy:</strong>
+                <ul class="mb-0 mt-2">
+                    <li>Students with attendance below {{ form.attendance_percentage_required.value }}% may not be eligible for examination</li>
+                    <li>Late arrivals are marked based on school start time</li>
+                    <li>Parent notifications are sent for consecutive absences</li>
+                </ul>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                <a href="{% url 'settings:dashboard' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                <button type="submit" class="btn btn-danger px-4">
+                    <i class="bi bi-check-lg me-2"></i>Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

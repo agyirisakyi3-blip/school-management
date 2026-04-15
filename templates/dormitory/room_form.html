@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if object %}Edit Room{% else %}Add Room{% endif %} - School Management{% endblock %}
+
+{% block page_title %}{% if object %}Edit Room{% else %}Add Room{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-door-open text-primary me-2"></i>
+                    {% if object %}Edit Room{% else %}Add New Room{% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.dormitory.label }}</label>
+                            {{ form.dormitory }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.room_number.label }}</label>
+                            {{ form.room_number }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.room_type.label }}</label>
+                            {{ form.room_type }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.floor.label }}</label>
+                            {{ form.floor }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.total_beds.label }}</label>
+                            {{ form.total_beds }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.cost_per_bed.label }}</label>
+                            {{ form.cost_per_bed }}
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">{{ form.description.label }}</label>
+                            {{ form.description }}
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-check">
+                                {{ form.is_available }}
+                                <label class="form-check-label" for="{{ form.is_available.id_for_label }}">
+                                    Available
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-2"></i>Save
+                        </button>
+                        <a href="{% url 'dormitory:dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-lg me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

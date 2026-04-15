@@ -1,0 +1,218 @@
+{% extends 'settings/dashboard.html' %}
+{% load crispy_forms_tags %}
+
+{% block settings_content %}
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-0"><i class="bi bi-sliders text-success me-2"></i>General Settings</h5>
+                <p class="text-muted small mb-0">Configure basic system settings</p>
+            </div>
+            <a href="{% url 'settings:dashboard' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Back
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h6 class="text-muted mb-3"><i class="bi bi-globe me-2"></i>Regional Settings</h6>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted fw-bold">Date Format</label>
+                    {{ form.date_format }}
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted fw-bold">Time Format</label>
+                    {{ form.time_format }}
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted fw-bold">Timezone</label>
+                    {{ form.timezone }}
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted fw-bold">Decimal Places</label>
+                    {{ form.decimal_places }}
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h6 class="text-muted mb-3"><i class="bi bi-cash-stack me-2"></i>Currency Settings</h6>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small text-muted fw-bold">Currency</label>
+                    {{ form.currency }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small text-muted fw-bold">Currency Symbol</label>
+                    {{ form.currency_symbol }}
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h6 class="text-muted mb-3"><i class="bi bi-clock me-2"></i>School Timings</h6>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted fw-bold">School Start Time</label>
+                    {{ form.school_start_time }}
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted fw-bold">School End Time</label>
+                    {{ form.school_end_time }}
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted fw-bold">Class Duration (min)</label>
+                    {{ form.class_duration }}
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted fw-bold">Break Duration (min)</label>
+                    {{ form.break_duration }}
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label class="form-label small text-muted fw-bold">Working Days</label>
+                    {{ form.working_days }}
+                    <div class="form-text">Comma-separated days (e.g., Monday,Tuesday,Wednesday)</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted fw-bold">Academic Year Start Month</label>
+                    {{ form.academic_year_start_month }}
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h6 class="text-muted mb-3"><i class="bi bi-person-badge me-2"></i>ID Prefixes</h6>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small text-muted fw-bold">Student ID Prefix</label>
+                    {{ form.student_id_prefix }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small text-muted fw-bold">Teacher ID Prefix</label>
+                    {{ form.teacher_id_prefix }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small text-muted fw-bold">Staff ID Prefix</label>
+                    {{ form.staff_id_prefix }}
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h6 class="text-muted mb-3"><i class="bi bi-toggle-on me-2"></i>System Options</h6>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check form-switch mb-3">
+                        {{ form.require_student_photo }}
+                        <label class="form-check-label" for="{{ form.require_student_photo.id_for_label }}">
+                            <strong>Require Student Photo</strong>
+                            <small class="text-muted d-block">Students must upload a profile photo during registration</small>
+                        </label>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        {{ form.require_guardian_info }}
+                        <label class="form-check-label" for="{{ form.require_guardian_info.id_for_label }}">
+                            <strong>Require Guardian Information</strong>
+                            <small class="text-muted d-block">Guardian details are mandatory for student admission</small>
+                        </label>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        {{ form.auto_assign_roll_number }}
+                        <label class="form-check-label" for="{{ form.auto_assign_roll_number.id_for_label }}">
+                            <strong>Auto-assign Roll Numbers</strong>
+                            <small class="text-muted d-block">Automatically assign roll numbers to new students</small>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check form-switch mb-3">
+                        {{ form.enable_sms }}
+                        <label class="form-check-label" for="{{ form.enable_sms.id_for_label }}">
+                            <strong>Enable SMS Notifications</strong>
+                            <small class="text-muted d-block">Send SMS alerts for important updates</small>
+                        </label>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        {{ form.enable_notifications }}
+                        <label class="form-check-label" for="{{ form.enable_notifications.id_for_label }}">
+                            <strong>Enable System Notifications</strong>
+                            <small class="text-muted d-block">Show in-app notifications for users</small>
+                        </label>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        {{ form.enable_parent_portal }}
+                        <label class="form-check-label" for="{{ form.enable_parent_portal.id_for_label }}">
+                            <strong>Enable Parent Portal</strong>
+                            <small class="text-muted d-block">Allow parents to access student information</small>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                <a href="{% url 'settings:dashboard' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                <button type="submit" class="btn btn-success px-4">
+                    <i class="bi bi-check-lg me-2"></i>Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+const currencySymbols = {
+    'USD': '$',
+    'EUR': '€',
+    'GBP': '£',
+    'INR': '₹',
+    'PKR': '₨',
+    'BDT': '৳',
+    'NGN': '₦',
+    'KES': 'KSh',
+    'ZAR': 'R',
+    'PHP': '₱',
+    'MYR': 'RM',
+    'SGD': 'S$',
+    'GHS': '₵',
+    'XOF': 'CFA',
+    'XAF': 'CFA'
+};
+
+function updateCurrencySymbol() {
+    const currencySelect = document.querySelector('[name="currency"]');
+    const symbolInput = document.querySelector('[name="currency_symbol"]');
+    if (currencySelect && symbolInput) {
+        const selected = currencySelect.value;
+        if (currencySymbols[selected]) {
+            symbolInput.value = currencySymbols[selected];
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const currencySelect = document.querySelector('[name="currency"]');
+    if (currencySelect) {
+        currencySelect.addEventListener('change', updateCurrencySymbol);
+        // Set initial symbol
+        updateCurrencySymbol();
+    }
+});
+</script>
+{% endblock %}

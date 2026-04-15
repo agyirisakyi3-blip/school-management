@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}Class Fees - School Management System{% endblock %}
+
+{% block page_title %}Class Fees{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <div>
+                    <h5 class="mb-0"><i class="bi bi-people text-success me-2"></i>Class Fee Assignments</h5>
+                    <p class="text-muted small mb-0">Assign fee groups to classes</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'finance:assign_fees' %}" class="btn btn-success">
+                        <i class="bi bi-plus-lg me-2"></i>Assign Fee
+                    </a>
+                    <a href="{% url 'finance:fee_group_list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-collection me-2"></i>Fee Groups
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="get" id="filterForm">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label small text-muted">Class</label>
+                            <select name="class" class="form-select" onchange="this.form.submit()">
+                                <option value="">All Classes</option>
+                                {% for cls in classes %}
+                                <option value="{{ cls.pk }}" {% if class_filter == cls.pk|stringformat:"s" %}selected{% endif %}>
+                                    {{ cls.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small text-muted">Academic Year</label>
+                            <select name="academic_year" class="form-select" onchange="this.form.submit()">
+                                <option value="">All Years</option>
+                                {% for year in academic_years %}
+                                <option value="{{ year.pk }}" {% if academic_year_filter == year.pk|stringformat:"s" %}selected{% endif %}>
+                                    {{ year.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <a href="{% url 'finance:class_fee_list' %}" class="btn btn-outline-secondary w-100">
+                                <i class="bi bi-x-circle me-2"></i>Clear
+                            </a>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 py-3">Class</th>
+                                <th class="border-0 py-3">Fee Group</th>
+                                <th class="border-0 py-3">Particulars</th>
+                                <th class="border-0 py-3">Total Amount</th>
+                                <th class="border-0 py-3">Status</th>
+                                <th class="border-0 py-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cf in class_fees %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle bg-success text-white me-3">
+                                            {{ cf.assigned_class.name|make_list|first|upper }}
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">{{ cf.assigned_class.name }}</h6>
+                                            <small class="text-muted">{{ cf.assigned_class.code }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <strong>{{ cf.fee_group.name }}</strong>
+                                    <small class="d-block text-muted">{{ cf.fee_group.academic_year.name }}</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ cf.fee_group.particulars.count }} items</span>
+                                </td>
+                                <td>
+                                    <strong class="text-success">${{ cf.get_total_amount }}</strong>
+                                </td>
+                                <td>
+                                    {% if cf.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{% url 'finance:class_fee_update' cf.pk %}" class="btn btn-sm btn-light" title="Edit">
+                                            <i class="bi bi-pencil text-warning"></i>
+                                        </a>
+                                        <a href="{% url 'finance:class_fee_delete' cf.pk %}" class="btn btn-sm btn-light" title="Delete">
+                                            <i class="bi bi-trash text-danger"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="bi bi-people fs-1 d-block mb-3"></i>
+                                        <h5>No Class Fees Assigned</h5>
+                                        <p>Assign fee groups to classes to generate student fees.</p>
+                                        <a href="{% url 'finance:assign_fees' %}" class="btn btn-success">
+                                            <i class="bi bi-plus-lg me-2"></i>Assign Fee
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-circle {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+    }
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+</style>
+{% endblock %}

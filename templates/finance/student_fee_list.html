@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+
+{% block title %}Fees - School Management System{% endblock %}
+
+{% block page_title %}Fee Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-currency-dollar me-2"></i>Student Fees</h2>
+    {% if user.is_admin_user %}
+    <div>
+        <a href="{% url 'finance:generate_fees' %}" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Generate Fees
+        </a>
+        <a href="{% url 'finance:payment_create' %}" class="btn btn-primary">
+            <i class="bi bi-currency-dollar"></i> Record Payment
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="bg-primary bg-opacity-10 rounded-3 p-3">
+            <div class="d-flex align-items-center">
+                <div class="bg-primary rounded-circle p-3 me-3">
+                    <i class="bi bi-wallet2 text-white"></i>
+                </div>
+                <div>
+                    <h3 class="mb-0">${{ total_fees|default:"0"|floatformat:0 }}</h3>
+                    <small class="text-muted">Total Fees</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="bg-success bg-opacity-10 rounded-3 p-3">
+            <div class="d-flex align-items-center">
+                <div class="bg-success rounded-circle p-3 me-3">
+                    <i class="bi bi-check-circle text-white"></i>
+                </div>
+                <div>
+                    <h3 class="mb-0">${{ total_paid|default:"0"|floatformat:0 }}</h3>
+                    <small class="text-muted">Collected</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="bg-danger bg-opacity-10 rounded-3 p-3">
+            <div class="d-flex align-items-center">
+                <div class="bg-danger rounded-circle p-3 me-3">
+                    <i class="bi bi-exclamation-circle text-white"></i>
+                </div>
+                <div>
+                    <h3 class="mb-0">${{ pending_fees|default:"0"|floatformat:0 }}</h3>
+                    <small class="text-muted">Pending</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="bg-warning bg-opacity-10 rounded-3 p-3">
+            <div class="d-flex align-items-center">
+                <div class="bg-warning rounded-circle p-3 me-3">
+                    <i class="bi bi-hourglass-split text-white"></i>
+                </div>
+                <div>
+                    <h3 class="mb-0">{{ overdue_count|default:"0" }}</h3>
+                    <small class="text-muted">Overdue</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-white">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" name="student" class="form-control" placeholder="Search by Student ID..." value="{{ request.GET.student }}">
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">All Status</option>
+                    <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="partial" {% if request.GET.status == 'partial' %}selected{% endif %}>Partial</option>
+                    <option value="paid" {% if request.GET.status == 'paid' %}selected{% endif %}>Paid</option>
+                    <option value="overdue" {% if request.GET.status == 'overdue' %}selected{% endif %}>Overdue</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-secondary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>ID</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Paid</th>
+                        <th>Balance</th>
+                        <th>Due Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fee in student_fees %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle bg-primary text-white me-3">
+                                    {{ fee.student.user.first_name|make_list|first|upper }}
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">{{ fee.student.user.get_full_name }}</h6>
+                                    <small class="text-muted">{{ fee.student.current_class.name|default:"" }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td><code>{{ fee.student.student_id }}</code></td>
+                        <td>{{ fee.fee_structure.category.name }}</td>
+                        <td><strong>${{ fee.amount|floatformat:2 }}</strong></td>
+                        <td><span class="text-success">${{ fee.amount_paid|floatformat:2 }}</span></td>
+                        <td><span class="text-danger">${{ fee.balance|floatformat:2 }}</span></td>
+                        <td>{{ fee.due_date|date:"M d, Y" }}</td>
+                        <td>
+                            <span class="badge bg-{% if fee.status == 'paid' %}success{% elif fee.status == 'partial' %}warning{% elif fee.status == 'overdue' %}danger{% else %}secondary{% endif %}">
+                                {{ fee.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="#" class="btn btn-sm btn-light" title="View">
+                                    <i class="bi bi-eye text-primary"></i>
+                                </a>
+                                {% if fee.status != 'paid' and user.is_admin_user %}
+                                <a href="{% url 'finance:payment_create' %}?fee={{ fee.pk }}" class="btn btn-sm btn-success" title="Record Payment">
+                                    <i class="bi bi-currency-dollar"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="bi bi-wallet2 fs-1 d-block mb-3"></i>
+                                <h5>No Fee Records Found</h5>
+                                <p>Generate fees for students to get started.</p>
+                                {% if user.is_admin_user %}
+                                <a href="{% url 'finance:generate_fees' %}" class="btn btn-primary">
+                                    <i class="bi bi-plus-circle me-2"></i>Generate Fees
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        {% if page_obj.has_other_pages %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                </li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}

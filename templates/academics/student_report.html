@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Report - School Management System{% endblock %}
+
+{% block page_title %}Student Report Card{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-file-earmark-text me-2"></i>{{ student.user.get_full_name }}'s Report</h2>
+    <div>
+        <a href="{% url 'academics:student_report_pdf' student.pk %}" class="btn btn-danger">
+            <i class="bi bi-file-pdf"></i> Download PDF
+        </a>
+        <button class="btn btn-primary" onclick="window.print()">
+            <i class="bi bi-printer"></i> Print
+        </button>
+        <a href="{% url 'students:student_detail' student.pk %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Student Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <p class="mb-1 text-muted small">Student Name</p>
+                        <p class="mb-0 fw-medium">{{ student.user.get_full_name }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="mb-1 text-muted small">Student ID</p>
+                        <p class="mb-0 fw-medium">{{ student.student_id }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="mb-1 text-muted small">Class</p>
+                        <p class="mb-0 fw-medium">{{ student.current_class.name|default:"-" }} - {{ student.current_class.section|default:"" }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <p class="mb-1 text-muted small">Roll Number</p>
+                        <p class="mb-0 fw-medium">{{ student.roll_number|default:"-" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stat-card primary">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-value">{{ attendance_pct|default:"0" }}%</div>
+                            <div class="stat-label">Attendance</div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card success">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-value">{{ results.count }}</div>
+                            <div class="stat-label">Exams Taken</div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="bi bi-file-text"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card warning">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-value">{{ attendance_summary.count }}</div>
+                            <div class="stat-label">Total Classes</div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="bi bi-collection"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card info">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-value">{{ student.guardian_name }}</div>
+                            <div class="stat-label">Guardian</div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="bi bi-person"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Academic Results</h5>
+            </div>
+            <div class="card-body">
+                {% if results %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Exam</th>
+                                <th>Marks Obtained</th>
+                                <th>Max Marks</th>
+                                <th>Percentage</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in results %}
+                            <tr>
+                                <td>{{ result.exam_schedule.subject.name }}</td>
+                                <td>{{ result.exam_schedule.exam.name }}</td>
+                                <td>
+                                    <span class="badge bg-{% if result.marks_obtained >= result.exam_schedule.subject.passing_marks %}success{% else %}danger{% endif %}">
+                                        {{ result.marks_obtained }}
+                                    </span>
+                                </td>
+                                <td>{{ result.exam_schedule.subject.passing_marks }}</td>
+                                <td>{{ result.marks_obtained|add:0 }}%</td>
+                                <td>
+                                    {% if result.marks_obtained >= result.exam_schedule.subject.passing_marks %}
+                                    <span class="badge bg-success">Pass</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Fail</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-file-text fs-1"></i>
+                    <p class="mt-2">No results available for this student</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Attendance Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-success bg-opacity-10 rounded-3">
+                            <i class="bi bi-check-circle text-success fs-2"></i>
+                            <h4 class="mt-2 mb-0">{{ attendance_summary|length }}</h4>
+                            <small class="text-muted">Total Records</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-primary bg-opacity-10 rounded-3">
+                            <i class="bi bi-check-square text-primary fs-2"></i>
+                            <h4 class="mt-2 mb-0">{{ attendance_summary.filter.status="present"|length }}</h4>
+                            <small class="text-muted">Present</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-danger bg-opacity-10 rounded-3">
+                            <i class="bi bi-x-circle text-danger fs-2"></i>
+                            <h4 class="mt-2 mb-0">{{ attendance_summary.filter.status="absent"|length }}</h4>
+                            <small class="text-muted">Absent</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center p-3 bg-warning bg-opacity-10 rounded-3">
+                            <i class="bi bi-clock text-warning fs-2"></i>
+                            <h4 class="mt-2 mb-0">{{ attendance_summary.filter.status="late"|length }}</h4>
+                            <small class="text-muted">Late</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

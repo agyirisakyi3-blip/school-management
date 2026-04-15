@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Evaluate Submission - School Management{% endblock %}
+
+{% block page_title %}Evaluate Submission{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-clipboard-check text-primary me-2"></i>
+                    Evaluate: {{ object.student.user.get_full_name }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-secondary mb-4">
+                    <strong>Homework:</strong> {{ object.homework.title }}<br>
+                    <strong>Subject:</strong> {{ object.homework.subject.name }}<br>
+                    <strong>Submitted:</strong> {{ object.submitted_at|date:"M d, Y H:i" }}
+                </div>
+                {% if object.submission_text %}
+                <div class="mb-4">
+                    <strong>Submission Text:</strong>
+                    <div class="p-3 bg-light rounded">{{ object.submission_text|linebreaks }}</div>
+                </div>
+                {% endif %}
+                {% if object.attachment %}
+                <div class="mb-4">
+                    <strong>Attachment:</strong>
+                    <a href="{{ object.attachment.url }}" class="btn btn-sm btn-info" target="_blank">
+                        <i class="bi bi-download me-1"></i>Download
+                    </a>
+                </div>
+                {% endif %}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">{{ form.status.label }}</label>
+                            {{ form.status }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{{ form.marks.label }}</label>
+                            {{ form.marks }}
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">{{ form.feedback.label }}</label>
+                            {{ form.feedback }}
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-lg me-2"></i>Save Evaluation
+                        </button>
+                        <a href="{% url 'homework:submissions' object.homework.pk %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-lg me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

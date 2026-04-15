@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Remove Discount - School Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card border-0 shadow-sm mt-5">
+            <div class="card-body text-center py-5">
+                <div class="mb-4">
+                    <i class="bi bi-exclamation-triangle text-danger fs-1"></i>
+                </div>
+                <h4 class="mb-3">Remove Student Discount?</h4>
+                <p class="text-muted">
+                    Are you sure you want to remove <strong>{{ object.discount_category.name }}</strong> discount from <strong>{{ object.student.user.get_full_name }}</strong>?
+                </p>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-center gap-2 mt-4">
+                        <a href="{% url 'finance:student_discount_list' %}" class="btn btn-outline-secondary px-4">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-danger px-4">
+                            <i class="bi bi-trash me-2"></i>Remove
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

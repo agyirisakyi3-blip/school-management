@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Detail - School Management System{% endblock %}
+
+{% block page_title %}Book Details{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <a href="{% url 'library:book_list' %}" class="btn btn-outline-secondary mb-3">
+            <i class="bi bi-arrow-left me-2"></i>Back to Library
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body text-center">
+                <div class="avatar-circle-lg bg-primary text-white mx-auto mb-3">
+                    <i class="bi bi-book fs-1"></i>
+                </div>
+                <h4 class="mb-1">{{ book.title }}</h4>
+                <p class="text-muted">{{ book.author }}</p>
+                <p>
+                    {% if book.is_available %}
+                    <span class="badge bg-success px-3 py-2">Available</span>
+                    {% else %}
+                    <span class="badge bg-danger px-3 py-2">Not Available</span>
+                    {% endif %}
+                </p>
+                {% if user.is_admin_user %}
+                <div class="d-flex justify-content-center gap-2 mt-3">
+                    <a href="{% url 'library:book_update' book.pk %}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-pencil me-2"></i>Edit
+                    </a>
+                    <a href="{% url 'library:book_delete' book.pk %}" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-trash me-2"></i>Delete
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0"><i class="bi bi-info-circle text-primary me-2"></i>Availability</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">Total Copies</span>
+                    <span class="badge bg-primary">{{ book.quantity }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">Available</span>
+                    <span class="badge bg-success">{{ book.available_quantity }}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted">Issued</span>
+                    <span class="badge bg-warning">{{ book.quantity|add:"-"|add:book.available_quantity }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0"><i class="bi bi-book text-primary me-2"></i>Book Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">ISBN</label>
+                        <p class="mb-0 fw-medium"><code>{{ book.isbn }}</code></p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Category</label>
+                        <p class="mb-0">{{ book.category.name|default:"Uncategorized" }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Author</label>
+                        <p class="mb-0">{{ book.author }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Publisher</label>
+                        <p class="mb-0">{{ book.publisher|default:"N/A" }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Price</label>
+                        <p class="mb-0">${{ book.price }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Location</label>
+                        <p class="mb-0"><code>{{ book.location|default:"N/A" }}</code></p>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label class="text-muted small">Description</label>
+                        <p class="mb-0">{{ book.description|default:"No description available." }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if user.is_admin_user %}
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0"><i class="bi bi-arrow-up-circle text-primary me-2"></i>Issue Book</h6>
+            </div>
+            <div class="card-body">
+                {% if book.is_available %}
+                <a href="{% url 'library:issue_create' %}?book={{ book.pk }}" class="btn btn-primary">
+                    <i class="bi bi-arrow-up-circle me-2"></i>Issue This Book
+                </a>
+                {% else %}
+                <p class="text-muted mb-0">This book is currently not available for issuing.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .avatar-circle-lg {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 48px;
+    }
+</style>
+{% endblock %}

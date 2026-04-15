@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ message.subject }} - School Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 offset-md-1">
+        <div class="card">
+            <div class="card-header">
+                <h4>{{ message.subject }}</h4>
+                <small class="text-muted">
+                    From: {{ message.sender.get_full_name }} | {{ message.created_at }}
+                </small>
+            </div>
+            <div class="card-body">
+                <div class="message-content">
+                    {{ message.content|linebreaks }}
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'communication:message_reply' message.pk %}" class="btn btn-primary">Reply</a>
+                <a href="{% url 'communication:message_inbox' %}" class="btn btn-secondary">Back</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

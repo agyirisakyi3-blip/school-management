@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <title>{% block title %}School Management System{% endblock %}</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if user.is_authenticated %}
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <nav class="sidebar bg-dark text-white">
+            <div class="sidebar-header p-3 border-bottom border-secondary">
+                <h4 class="mb-0">
+                    <i class="bi bi-mortarboard-fill"></i> SchoolMS
+                </h4>
+                <small class="text-muted">{{ user.get_role_display }}</small>
+            </div>
+                      <div class="nav flex-column mt-2">
+                <div class="nav-item">
+                    <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="{% url 'users:dashboard' %}">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </div>
+                
+                {% if user.is_admin_user %}
+                <div class="nav-item">
+                    <a class="nav-link {% if 'admin-panel' in request.path %}active{% endif %}" href="{% url 'users:admin_control_panel' %}">
+                        <i class="bi bi-shield-lock"></i> Admin Panel
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if user.is_admin_user or user.is_teacher %}
+                <div class="nav-item">
+                    <a class="nav-link {% if 'students' in request.path %}active{% endif %}" href="{% url 'students:student_list' %}">
+                        <i class="bi bi-people"></i> Students
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if user.is_admin_user %}
+                <div class="nav-item">
+                    <a class="nav-link {% if 'teachers' in request.path %}active{% endif %}" href="{% url 'teachers:teacher_list' %}">
+                        <i class="bi bi-person-badge"></i> Teachers
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {% if 'classes' in request.path %}active{% endif %}" href="{% url 'students:class_list' %}">
+                        <i class="bi bi-collection"></i> Classes
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {% if 'subjects' in request.path %}active{% endif %}" href="{% url 'students:subject_list' %}">
+                        <i class="bi bi-book"></i> Subjects
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {% if 'academic-years' in request.path %}active{% endif %}" href="{% url 'students:academic_year_list' %}">
+                        <i class="bi bi-calendar3"></i> Academic Years
+                    </a>
+                </div>
+                {% endif %}
+                
+                <div class="nav-item">
+                    <a class="nav-link {% if 'attendance' in request.path %}active{% endif %}" href="{% url 'academics:attendance_list' %}">
+                        <i class="bi bi-calendar-check"></i> Attendance
+                    </a>
+                </div>
+                
+                {% if user.is_admin_user or user.is_teacher %}
+                <div class="nav-item">
+                    <a class="nav-link {% if 'exams' in request.path %}active{% endif %}" href="{% url 'academics:exam_list' %}">
+                        <i class="bi bi-file-text"></i> Exams
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {% if 'results' in request.path %}active{% endif %}" href="{% url 'academics:result_list' %}">
+                        <i class="bi bi-bar-chart"></i> Results
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if user.is_admin_user %}
+                <div class="nav-item">
+                    <a class="nav-link {% if 'fee' in request.path or 'particular' in request.path or 'group' in request.path or 'discount' in request.path %}active{% endif %}" href="#" data-bs-toggle="collapse" data-bs-target="#feesMenu">
+                        <i class="bi bi-currency-dollar"></i> Fees
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse {% if 'fee' in request.path or 'particular' in request.path or 'group' in request.path or 'discount' in request.path %}show{% endif %}" id="feesMenu">
+                        <div class="nav flex-column ms-3">
+                            <div class="nav-item">
+                                <a class="nav-link {% if 'fee-particulars' in request.path %}active{% endif %}" href="{% url 'finance:fee_particular_list' %}">
+                                    <i class="bi bi-receipt"></i> Fee Particulars
+                                </a>
+                            </div>
+                            <div class="nav-item">
+                                <a class="nav-link {% if 'fee-groups' in request.path %}active{% endif %}" href="{% url 'finance:fee_group_list' %}">
+                                    <i class="bi bi-folder"></i> Fee Groups
+                                </a>
+                            </div>
+                            <div class="nav-item">
+                                <a class="nav-link {% if 'discounts' in request.path %}active{% endif %}" href="{% url 'finance:discount_category_list' %}">
+                                    <i class="bi bi-tag"></i> Fee Discounts
+                                </a>
+                            </div>
+                            <div class="nav-item">
+                                <a class="nav-link {% if 'payments' in request.path %}active{% endif %}" href="{% url 'finance:payment_list' %}">
+                                    <i class="bi bi-cash-coin"></i> Fee Collections
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {% if 'expenses' in request.path %}active{% endif %}" href="{% url 'finance:expense_list' %}">
+                        <i class="bi bi-wallet2"></i> Expenses
+                    </a>
+                </div>
+                {% endif %}
+                 
+                {% if user.is_admin_user %}
+                <div class="nav-item">
+                    <a class="nav-link {% if 'library' in request.path %}active{% endif %}" href="#" data-bs-toggle="collapse" data-bs-target="#libraryMenu">
+                        <i class="bi bi-book"></i> Library
+                        <i class="bi bi-chevron-down ms-auto"></i>
+                    </a>
+                    <div class="collapse {% if 'library' in request.path %}show{% endif %}" id="libraryMenu">
+                        <div class="nav flex-column ms-3">
+                            <div class="nav-item">
+                                <a class="nav-link {% if 'library/books' in request.path %}active{% endif %}" href="{% url 'library:book_list' %}">
+                                    <i class="bi bi-book"></i> Books
+                                </a>
+                            </div>
+                            <div class="nav-item">
+                                <a class="nav-link {% if 'library/categories' in request.path %}active{% endif %}" href="{% url 'library:category_list' %}">
+                                    <i class="bi bi-tags"></i> Categories
+                                </a>
+                            </div>
+                            <div class="nav-item">
+                                <a class="nav-link {% if 'library/issues' in request.path %}active{% endif %}" href="{% url 'library:issue_list' %}">
+                                    <i class="bi bi-arrow-down-up"></i> Issue/Return
+                                </a>
+                            </div>
+                            <div class="nav-item">
+                                <a class="nav-link {% if 'library/members' in request.path %}active{% endif %}" href="{% url 'library:member_list' %}">
+                                    <i class="bi bi-people"></i> Members
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {% if 'transport' in request.path %}active{% endif %}" href="{% url 'transport:dashboard' %}">
+                        <i class="bi bi-truck"></i> Transport
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {% if 'dormitory' in request.path %}active{% endif %}" href="{% url 'dormitory:dashboard' %}">
+                        <i class="bi bi-house-door"></i> Dormitory
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if user.is_teacher %}
+                <div class="nav-item">
+                    <a class="nav-link {% if 'homework' in request.path %}active{% endif %}" href="{% url 'homework:list' %}">
+                        <i class="bi bi-journal-text"></i> Homework
+                    </a>
+                </div>
+                {% endif %}
+                
+                {% if user.is_student %}
+                <div class="nav-item">
+                    <a class="nav-link {% if 'homework' in request.path %}active{% endif %}" href="{% url 'homework:list' %}">
+                        <i class="bi bi-journal-text"></i> Homework
+                    </a>
+                </div>
+                {% endif %}
+                
+                <div class="nav-item">
+                    <a class="nav-link {% if 'leaves' in request.path %}active{% endif %}" href="{% url 'leaves:dashboard' %}">
+                        <i class="bi bi-calendar-minus"></i> Leave
+                    </a>
+                </div>
+                
+                {% if user.is_admin_user %}
+                <div class="nav-item">
+                    <a class="nav-link {% if 'frontdesk' in request.path %}active{% endif %}" href="{% url 'frontdesk:dashboard' %}">
+                        <i class="bi bi-building"></i> Front Office
+                    </a>
+                </div>
+                {% endif %}
+                
+                <div class="nav-item">
+                    <a class="nav-link {% if 'announcements' in request.path %}active{% endif %}" href="{% url 'communication:announcement_list' %}">
+                        <i class="bi bi-megaphone"></i> Announcements
+                    </a>
+                </div>
+                
+                <div class="nav-item">
+                    <a class="nav-link {% if 'messages' in request.path %}active{% endif %}" href="{% url 'communication:message_inbox' %}">
+                        <i class="bi bi-envelope"></i> Messages
+                    </a>
+                </div>
+
+                {% if user.is_admin_user %}
+                <div class="nav-item mt-3">
+                    <span class="nav-link text-muted small text-uppercase"><i class="bi bi-gear me-1"></i> System</span>
+                </div>
+                <div class="nav-item">
+                    <a class="nav-link {% if 'settings' in request.path %}active{% endif %}" href="{% url 'settings:dashboard' %}">
+                        <i class="bi bi-sliders"></i> Settings
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="sidebar-footer mt-auto p-3 border-top border-secondary">
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+                        {% if user.profile_picture %}
+                            <img src="{{ user.profile_picture.url }}" alt="" class="nav-profile-img me-2">
+                        {% else %}
+                            <i class="bi bi-person-circle fs-4 me-2"></i>
+                        {% endif %}
+                        <strong>{{ user.get_full_name|truncatechars:15 }}</strong>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                        <li><a class="dropdown-item" href="{% url 'users:profile_update' %}"><i class="bi bi-camera me-2"></i>Change Photo</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'users:logout' %}">Sign out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Main Content -->
+        <div class="main-content flex-grow-1">
+            <!-- Top Header -->
+            <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+                <div class="container-fluid">
+                    <button class="btn btn-link d-md-none" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-label="Toggle sidebar menu" title="Toggle sidebar">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <span class="navbar-brand mb-0 h5">{% block page_title %}Dashboard{% endblock %}</span>
+                    <div class="d-flex align-items-center">
+                        <a href="{% url 'communication:notification_list' %}" class="btn btn-link position-relative">
+                            <i class="bi bi-bell fs-5"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                0
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+            
+            <!-- Page Content -->
+            <main class="container-fluid py-4">
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close alert" title="Close"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+                
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+    {% else %}
+    {% block auth_content %}{% endblock %}
+    {% endif %}
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/script.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

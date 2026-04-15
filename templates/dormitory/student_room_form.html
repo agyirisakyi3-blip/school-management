@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Assign Student to Room - School Management{% endblock %}
+
+{% block page_title %}Assign Student to Room{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-people text-primary me-2"></i>
+                    Assign Student to Room
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.student.label }}</label>
+                            {{ form.student }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.room.label }}</label>
+                            {{ form.room }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.bed_number.label }}</label>
+                            {{ form.bed_number }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.start_date.label }}</label>
+                            {{ form.start_date }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.end_date.label }}</label>
+                            {{ form.end_date }}
+                            <small class="text-muted">Leave empty if ongoing</small>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-check">
+                                {{ form.is_active }}
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                    Active
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-2"></i>Save
+                        </button>
+                        <a href="{% url 'dormitory:dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-lg me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

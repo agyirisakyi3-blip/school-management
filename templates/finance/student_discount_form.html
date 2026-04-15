@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Assign Discount - School Management System{% endblock %}
+
+{% block page_title %}Assign Discount to Student{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <div>
+                    <h5 class="mb-0"><i class="bi bi-tag text-warning me-2"></i>Assign Discount</h5>
+                    <p class="text-muted small mb-0">Assign a discount category to a student</p>
+                </div>
+                <a href="{% url 'finance:student_discount_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Back
+                </a>
+            </div>
+            <div class="card-body">
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <label class="form-label small text-muted fw-bold">Student <span class="text-danger">*</span></label>
+                            {{ form.student }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <label class="form-label small text-muted fw-bold">Discount Category <span class="text-danger">*</span></label>
+                            {{ form.discount_category }}
+                            <div class="form-text">Select the discount to apply</div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small text-muted fw-bold">Start Date</label>
+                            {{ form.start_date }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-muted fw-bold">End Date</label>
+                            {{ form.end_date }}
+                            <div class="form-text">Leave blank for indefinite</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small text-muted fw-bold">Reason</label>
+                        {{ form.reason }}
+                        <div class="form-text">Optional reason for the discount</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-check form-switch">
+                            {{ form.is_active }}
+                            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                <strong>Active</strong>
+                                <small class="text-muted d-block">Discount is currently applied</small>
+                            </label>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'finance:student_discount_list' %}" class="btn btn-outline-secondary px-4">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-warning px-4">
+                            <i class="bi bi-check-lg me-2"></i>Assign Discount
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 10px 15px;
+        border: 1px solid #e2e8f0;
+    }
+    label.form-label {
+        margin-bottom: 6px;
+    }
+</style>
+{% endblock %}

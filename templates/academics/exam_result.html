@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Exam Result - School Management System{% endblock %}
+
+{% block page_title %}Exam Result{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-4 text-center">
+                <i class="bi bi-award text-success fs-1 d-block mb-3"></i>
+                <h4 class="mb-0">Exam Completed!</h4>
+            </div>
+            <div class="card-body text-center py-4">
+                <h5 class="text-muted mb-3">{{ student_exam.exam_schedule.exam.name }}</h5>
+                <h6 class="mb-4">{{ student_exam.exam_schedule.subject.name }}</h6>
+                
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="p-3 bg-light rounded">
+                            <h3 class="mb-0 text-primary">{{ student_exam.score }}</h3>
+                            <small class="text-muted">Score</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 bg-light rounded">
+                            <h3 class="mb-0">{{ student_exam.exam_schedule.total_marks }}</h3>
+                            <small class="text-muted">Total Marks</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 bg-light rounded">
+                            <h3 class="mb-0 {% if student_exam.percentage >= 50 %}text-success{% else %}text-danger{% endif %}">
+                                {{ student_exam.percentage|floatformat:1 }}%
+                            </h3>
+                            <small class="text-muted">Percentage</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    {% if student_exam.percentage >= student_exam.exam_schedule.passing_marks %}
+                    <span class="badge bg-success fs-5 px-4 py-2">PASSED</span>
+                    {% else %}
+                    <span class="badge bg-danger fs-5 px-4 py-2">FAILED</span>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="{% url 'academics:online_exam_list' %}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Exams
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

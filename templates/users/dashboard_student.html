@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard - School Management System{% endblock %}
+
+{% block page_title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="welcome-banner bg-gradient-success text-white p-4 rounded-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-1">Welcome, {{ user.get_full_name }}!</h3>
+                    <p class="mb-0 opacity-75">
+                        {% if student %}
+                        Roll No: {{ student.student_id }} | Class: {{ student.current_class.name }} - {{ student.current_class.section }}
+                        {% else %}
+                        Welcome to your student portal
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="text-end d-none d-md-block">
+                    <i class="bi bi-person-badge fs-1 opacity-25"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="stat-card primary">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ attendance_pct|default:"0" }}%</div>
+                    <div class="stat-label">Attendance</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+            </div>
+            <a href="{% url 'academics:attendance_list' %}" class="stat-link">View Details <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="stat-card success">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ my_results.count|default:"0" }}</div>
+                    <div class="stat-label">Exams Taken</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-file-text"></i>
+                </div>
+            </div>
+            <a href="{% url 'academics:result_list' %}" class="stat-link">View Results <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="stat-card warning">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ upcoming_exams.count|default:"0" }}</div>
+                    <div class="stat-label">Upcoming Exams</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-calendar-event"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="stat-card info">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    {% with my_fees|first as first_fee %}
+                    <div class="stat-value">
+                        {% if first_fee and first_fee.status == 'paid' %}
+                        <span class="text-success">Paid</span>
+                        {% elif first_fee and first_fee.status == 'partial' %}
+                        <span class="text-warning">Partial</span>
+                        {% elif first_fee %}
+                        <span class="text-danger">Pending</span>
+                        {% else %}
+                        -
+                        {% endif %}
+                    </div>
+                    {% endwith %}
+                    <div class="stat-label">Fee Status</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+            </div>
+            <a href="{% url 'finance:student_fee_list' %}" class="stat-link">View Details <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-calendar-week me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'academics:timetable_list' %}" class="btn btn-primary">
+                        <i class="bi bi-calendar-week me-2"></i> View Timetable
+                    </a>
+                    <a href="{% url 'academics:result_list' %}" class="btn btn-success">
+                        <i class="bi bi-bar-chart me-2"></i> My Results
+                    </a>
+                    <a href="{% url 'academics:attendance_list' %}" class="btn btn-info text-white">
+                        <i class="bi bi-calendar-check me-2"></i> Attendance Record
+                    </a>
+                    <a href="{% url 'finance:student_fee_list' %}" class="btn btn-warning">
+                        <i class="bi bi-wallet2 me-2"></i> Fee Details
+                    </a>
+                    <a href="{% url 'communication:message_inbox' %}" class="btn btn-secondary">
+                        <i class="bi bi-envelope me-2"></i> Messages
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i>Upcoming Exams</h5>
+            </div>
+            <div class="card-body">
+                {% if upcoming_exams %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Exam Name</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Academic Year</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for exam in upcoming_exams %}
+                            <tr>
+                                <td>{{ exam.name }}</td>
+                                <td>{{ exam.start_date|date:"M d, Y" }}</td>
+                                <td>{{ exam.end_date|date:"M d, Y" }}</td>
+                                <td>{{ exam.academic_year.name }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-calendar-x fs-1"></i>
+                    <p class="mt-2">No upcoming exams scheduled</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>My Recent Results</h5>
+            </div>
+            <div class="card-body">
+                {% if my_results %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Exam</th>
+                                <th>Marks Obtained</th>
+                                <th>Max Marks</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in my_results|slice:":10" %}
+                            <tr>
+                                <td>{{ result.exam_schedule.subject.name }}</td>
+                                <td>{{ result.exam_schedule.exam.name }}</td>
+                                <td>
+                                    <span class="badge {% if result.marks_obtained >= result.exam_schedule.subject.passing_marks %}bg-success{% else %}bg-danger{% endif %}">
+                                        {{ result.marks_obtained }}
+                                    </span>
+                                </td>
+                                <td>{{ result.exam_schedule.subject.passing_marks }}</td>
+                                <td>{{ result.marks_obtained|add:0 }}%</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-file-text fs-1"></i>
+                    <p class="mt-2">No results available yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

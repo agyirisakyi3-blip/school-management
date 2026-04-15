@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Announcements - School Management System{% endblock %}
+
+{% block page_title %}Announcements{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-1">School Announcements</h4>
+        <p class="text-muted mb-0">Stay updated with important news</p>
+    </div>
+    {% if user.is_admin_user %}
+    <a href="{% url 'communication:announcement_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-2"></i>New Announcement
+    </a>
+    {% endif %}
+</div>
+
+<div class="row">
+    {% for announcement in announcements %}
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="badge bg-{% if announcement.priority == 'urgent' %}danger{% elif announcement.priority == 'high' %}warning{% elif announcement.priority == 'medium' %}info{% else %}secondary{% endif %} me-2">
+                        {{ announcement.get_priority_display }}
+                    </span>
+                </div>
+                <small class="text-muted">{{ announcement.publish_date|date:"M d, Y" }}</small>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">{{ announcement.title }}</h5>
+                <p class="card-text">{{ announcement.content|truncatewords:30|linebreaks }}</p>
+            </div>
+            <div class="card-footer bg-white border-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        <i class="bi bi-person me-1"></i>{{ announcement.created_by.get_full_name }}
+                    </small>
+                    <a href="{% url 'communication:announcement_detail' announcement.pk %}" class="btn btn-sm btn-outline-primary">
+                        Read More
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-megaphone display-1 text-muted mb-3"></i>
+                <h5 class="text-muted">No Announcements Yet</h5>
+                <p class="text-muted">There are no announcements to display.</p>
+                {% if user.is_admin_user %}
+                <a href="{% url 'communication:announcement_create' %}" class="btn btn-primary">
+                    Create First Announcement
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

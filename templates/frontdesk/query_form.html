@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Admission Query - School Management{% endblock %}
+
+{% block page_title %}{% if object %}Edit Query{% else %}New Admission Query{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-chat-left-text text-primary me-2"></i>
+                    {% if object %}Edit Query{% else %}New Admission Query{% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.name.label }}</label>
+                            {{ form.name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.email.label }}</label>
+                            {{ form.email }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.phone.label }}</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.student_name.label }}</label>
+                            {{ form.student_name }}
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">{{ form.address.label }}</label>
+                            {{ form.address }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.class_interested.label }}</label>
+                            {{ form.class_interested }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.status.label }}</label>
+                            {{ form.status }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.follow_up_date.label }}</label>
+                            {{ form.follow_up_date }}
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">{{ form.message.label }}</label>
+                            {{ form.message }}
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">{{ form.notes.label }}</label>
+                            {{ form.notes }}
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-2"></i>Save
+                        </button>
+                        <a href="{% url 'frontdesk:dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-lg me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

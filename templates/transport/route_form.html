@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if object %}Edit Route{% else %}Add Route{% endif %} - School Management{% endblock %}
+
+{% block page_title %}{% if object %}Edit Route{% else %}Add Route{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-map text-primary me-2"></i>
+                    {% if object %}Edit Route{% else %}Add New Route{% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.name.label }}</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                            <small class="text-danger">{{ form.name.errors.0 }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.route_from.label }}</label>
+                            {{ form.route_from }}
+                            {% if form.route_from.errors %}
+                            <small class="text-danger">{{ form.route_from.errors.0 }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.route_to.label }}</label>
+                            {{ form.route_to }}
+                            {% if form.route_to.errors %}
+                            <small class="text-danger">{{ form.route_to.errors.0 }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">{{ form.description.label }}</label>
+                            {{ form.description }}
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-check">
+                                {{ form.is_active }}
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                    Active
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-2"></i>Save
+                        </button>
+                        <a href="{% url 'transport:dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-lg me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block title %}Teacher Profile - School Management System{% endblock %}
+
+{% block page_title %}Teacher Profile{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <a href="{% url 'teachers:teacher_list' %}" class="btn btn-outline-secondary mb-3">
+            <i class="bi bi-arrow-left me-2"></i>Back to Teachers
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body text-center">
+                {% if teacher.user.profile_picture %}
+                <img src="{{ teacher.user.profile_picture.url }}" class="rounded-circle mb-3" width="120" height="120" alt="{{ teacher.user.get_full_name }}">
+                {% else %}
+                <div class="avatar-circle-lg bg-primary text-white mx-auto mb-3">
+                    {{ teacher.user.first_name|make_list|first|upper }}
+                </div>
+                {% endif %}
+                <h4 class="mb-1">{{ teacher.user.get_full_name }}</h4>
+                <p class="text-muted mb-2">ID: <code>{{ teacher.employee_id }}</code></p>
+                <p class="mb-3">
+                    {% if teacher.is_active %}
+                    <span class="badge bg-success px-3 py-2">Active</span>
+                    {% else %}
+                    <span class="badge bg-danger px-3 py-2">Inactive</span>
+                    {% endif %}
+                </p>
+                {% if user.is_admin_user %}
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="{% url 'teachers:teacher_update' teacher.pk %}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-pencil me-2"></i>Edit Profile
+                    </a>
+                    <a href="{% url 'teachers:teacher_delete' teacher.pk %}" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-trash me-2"></i>Delete
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0"><i class="bi bi-graph-up text-primary me-2"></i>Statistics</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">Classes</span>
+                    <span class="badge bg-primary">{{ teacher.teacher_subjects.all.count }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">Subjects</span>
+                    <span class="badge bg-warning">{{ teacher.teacher_subjects.count }}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted">Experience</span>
+                    <span class="badge bg-info">{{ teacher.experience_years }} Years</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0"><i class="bi bi-person-badge text-primary me-2"></i>Personal Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Full Name</label>
+                        <p class="mb-0 fw-medium">{{ teacher.user.get_full_name }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Email</label>
+                        <p class="mb-0">{{ teacher.user.email|default:"Not provided" }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Phone</label>
+                        <p class="mb-0">{{ teacher.user.phone|default:"Not provided" }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Join Date</label>
+                        <p class="mb-0">{{ teacher.join_date|date:"M d, Y" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0"><i class="bi bi-briefcase text-primary me-2"></i>Professional Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Qualification</label>
+                        <p class="mb-0">{{ teacher.qualification }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Department</label>
+                        <p class="mb-0">{{ teacher.department|default:"Not assigned" }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Specialization</label>
+                        <p class="mb-0">{{ teacher.specialization|default:"Not specified" }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Experience</label>
+                        <p class="mb-0">{{ teacher.experience_years }} Years</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Salary</label>
+                        <p class="mb-0">{% if teacher.salary %}${{ teacher.salary }}{% else %}Not set{% endif %}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted small">Status</label>
+                        <p class="mb-0">
+                            {% if teacher.is_active %}
+                            <span class="badge bg-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0"><i class="bi bi-journal-text text-primary me-2"></i>Assigned Subjects</h6>
+                {% if user.is_admin_user %}
+                <a href="{% url 'teachers:teacher_subject_create' %}" class="btn btn-sm btn-primary">
+                    <i class="bi bi-plus-lg me-2"></i>Assign
+                </a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if teacher.teacher_subjects.all %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Class</th>
+                                <th>Academic Year</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for assignment in teacher.teacher_subjects.all %}
+                            <tr>
+                                <td>
+                                    <span class="badge bg-info">{{ assignment.subject.name }}</span>
+                                </td>
+                                <td>{{ assignment.assigned_class.name }}</td>
+                                <td>{{ assignment.academic_year.name }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="#" class="btn btn-light"><i class="bi bi-eye text-primary"></i></a>
+                                        <a href="#" class="btn btn-light"><i class="bi bi-pencil text-warning"></i></a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-journal-text fs-1 d-block mb-3 opacity-25"></i>
+                    <p class="mb-0">No subjects assigned yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-circle-lg {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 48px;
+    }
+</style>
+{% endblock %}

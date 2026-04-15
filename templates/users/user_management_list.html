@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% block title %}User Management - School Management System{% endblock %}
+{% block page_title %}User Management{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-1"><i class="bi bi-people-fill me-2"></i>All Users</h4>
+        <p class="text-muted mb-0">Manage all system users — admins, teachers, students & parents</p>
+    </div>
+    <div>
+        <a href="{% url 'users:admin_control_panel' %}" class="btn btn-outline-secondary me-2"><i class="bi bi-arrow-left me-1"></i>Control Panel</a>
+        <a href="{% url 'users:user_create' %}" class="btn btn-primary"><i class="bi bi-person-plus me-1"></i>Add User</a>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body py-3">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label for="search_input" class="form-label small fw-semibold">Search</label>
+                <input type="text" id="search_input" name="search" class="form-control" placeholder="Name, email or username..." value="{{ search_query }}">
+            </div>
+            <div class="col-md-2">
+                <label for="role_filter" class="form-label small fw-semibold">Role</label>
+                <select name="role" id="role_filter" class="form-select" title="Filter by Role">
+                    <option value="all" {% if current_role == "all" %}selected{% endif %}>All Roles</option>
+                    <option value="admin" {% if current_role == "admin" %}selected{% endif %}>Admin</option>
+                    <option value="teacher" {% if current_role == "teacher" %}selected{% endif %}>Teacher</option>
+                    <option value="student" {% if current_role == "student" %}selected{% endif %}>Student</option>
+                    <option value="parent" {% if current_role == "parent" %}selected{% endif %}>Parent</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="status_filter" class="form-label small fw-semibold">Status</label>
+                <select name="status" id="status_filter" class="form-select" title="Filter by Status">
+                    <option value="all" {% if current_status == "all" %}selected{% endif %}>All</option>
+                    <option value="active" {% if current_status == "active" %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if current_status == "inactive" %}selected{% endif %}>Inactive</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel me-1"></i>Filter</button>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'users:user_management' %}" class="btn btn-outline-secondary w-100"><i class="bi bi-x-lg me-1"></i>Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Users Table -->
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="border-0 py-3 ps-3">#</th>
+                        <th class="border-0 py-3">User</th>
+                        <th class="border-0 py-3">Username</th>
+                        <th class="border-0 py-3">Role</th>
+                        <th class="border-0 py-3">Status</th>
+                        <th class="border-0 py-3">Joined</th>
+                        <th class="border-0 py-3 text-end pe-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in users_list %}
+                    <tr>
+                        <td class="ps-3">{{ forloop.counter }}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle-sm me-2 avatar-role-{{ u.role }}">
+                                    {{ u.first_name|make_list|first|upper|default:"?" }}
+                                </div>
+                                <div>
+                                    <div class="fw-semibold">{{ u.get_full_name|default:u.username }}</div>
+                                    <small class="text-muted">{{ u.email }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td><code class="text-muted">{{ u.username }}</code></td>
+                        <td>
+                            <span class="badge {% if u.role == 'admin' %}bg-danger{% elif u.role == 'teacher' %}bg-success{% elif u.role == 'student' %}bg-primary{% else %}bg-warning text-dark{% endif %}">
+                                {{ u.get_role_display }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if u.is_active %}
+                            <span class="badge bg-success bg-opacity-10 text-success">Active</span>
+                            {% else %}
+                            <span class="badge bg-danger bg-opacity-10 text-danger">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td><small>{{ u.date_joined|date:"M d, Y" }}</small></td>
+                        <td class="text-end pe-3">
+                            <div class="btn-group btn-group-sm">
+                                <a href="{% url 'users:user_edit' u.pk %}" class="btn btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
+                                <a href="{% url 'users:user_reset_password' u.pk %}" class="btn btn-outline-warning" title="Reset Password"><i class="bi bi-key"></i></a>
+                                <a href="{% url 'users:user_toggle_active' u.pk %}" class="btn btn-outline-{% if u.is_active %}secondary{% else %}success{% endif %}" title="{% if u.is_active %}Deactivate{% else %}Activate{% endif %}">
+                                    <i class="bi bi-{% if u.is_active %}pause-circle{% else %}play-circle{% endif %}"></i>
+                                </a>
+                                <a href="{% url 'users:user_delete' u.pk %}" class="btn btn-outline-danger" title="Delete"><i class="bi bi-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5 text-muted">
+                            <i class="bi bi-people fs-1 d-block mb-2 opacity-50"></i>
+                            No users found matching your criteria
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if page_obj.has_other_pages %}
+<nav class="mt-4">
+    <div class="pagination justify-content-center">
+        {% if page_obj.has_previous %}<div class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&role={{ current_role }}&status={{ current_status }}&search={{ search_query }}">Previous</a></div>{% endif %}
+        {% for num in page_obj.paginator.page_range %}<div class="page-item {% if page_obj.number == num %}active{% endif %}"><a class="page-link" href="?page={{ num }}&role={{ current_role }}&status={{ current_status }}&search={{ search_query }}">{{ num }}</a></div>{% endfor %}
+        {% if page_obj.has_next %}<div class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&role={{ current_role }}&status={{ current_status }}&search={{ search_query }}">Next</a></div>{% endif %}
+    </div>
+</nav>
+{% endif %}
+
+{% endblock %}

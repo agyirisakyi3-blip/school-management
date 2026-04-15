@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Messages - School Management System{% endblock %}
+
+{% block page_title %}Inbox{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2><i class="bi bi-envelope me-2"></i>Inbox</h2>
+        <p class="text-muted mb-0">{{ messages.count }} messages</p>
+    </div>
+    <a href="{% url 'communication:message_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-2"></i>Compose
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="list-group">
+            <a href="{% url 'communication:message_inbox' %}" class="list-group-item list-group-item-action active d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-inbox me-2"></i>Inbox</span>
+                <span class="badge bg-primary">{{ messages.count }}</span>
+            </a>
+            <a href="{% url 'communication:message_sent' %}" class="list-group-item list-group-item-action">
+                <i class="bi bi-send me-2"></i>Sent
+            </a>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-body p-0">
+                {% if messages %}
+                <div class="list-group list-group-flush">
+                    {% for message in messages %}
+                    <a href="{% url 'communication:message_detail' message.pk %}" class="list-group-item list-group-item-action {% if not message.is_read %}bg-primary bg-opacity-5{% endif %}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="me-3">
+                                <div class="avatar-circle bg-{% if message.sender.role == 'admin' %}danger{% elif message.sender.role == 'teacher' %}info{% else %}success{% endif %} text-white">
+                                    {{ message.sender.first_name|make_list|first|upper }}
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="mb-1 {% if not message.is_read %}fw-bold{% endif %}">
+                                        {{ message.sender.get_full_name }}
+                                    </h6>
+                                    <small class="text-muted">{{ message.created_at|timesince }} ago</small>
+                                </div>
+                                <p class="mb-1 {% if not message.is_read %}fw-bold{% endif %}">{{ message.subject }}</p>
+                                <small class="text-muted">{{ message.body|truncatechars:50 }}</small>
+                            </div>
+                            <div>
+                                {% if not message.is_read %}
+                                <span class="badge bg-primary">New</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
+                    <h5 class="text-muted">No Messages</h5>
+                    <p class="text-muted">Your inbox is empty.</p>
+                    <a href="{% url 'communication:message_create' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-2"></i>Compose
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-circle {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+</style>
+{% endblock %}

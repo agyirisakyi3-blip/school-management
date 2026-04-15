@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}Discount Categories - School Management System{% endblock %}
+
+{% block page_title %}Discount Categories{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <div>
+                    <h5 class="mb-0"><i class="bi bi-percent text-warning me-2"></i>Discount Categories</h5>
+                    <p class="text-muted small mb-0">Manage discounts for students (sibling, merit, staff, etc.)</p>
+                </div>
+                <a href="{% url 'finance:discount_category_create' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-2"></i>Add Discount
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 py-3">Discount Name</th>
+                                <th class="border-0 py-3">Code</th>
+                                <th class="border-0 py-3">Type</th>
+                                <th class="border-0 py-3">Value</th>
+                                <th class="border-0 py-3">Max Amount</th>
+                                <th class="border-0 py-3">Status</th>
+                                <th class="border-0 py-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for discount in discounts %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle bg-warning text-white me-3">
+                                            <i class="bi bi-percent"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">{{ discount.name }}</h6>
+                                            <small class="text-muted">{{ discount.description|truncatechars:40|default:"No description" }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <code class="bg-light px-2 py-1 rounded">{{ discount.code }}</code>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ discount.get_discount_type_display }}</span>
+                                </td>
+                                <td>
+                                    <strong class="text-success">
+                                        {% if discount.discount_type == 'percentage' %}
+                                            {{ discount.value }}%
+                                        {% else %}
+                                            ${{ discount.value }}
+                                        {% endif %}
+                                    </strong>
+                                </td>
+                                <td>
+                                    {% if discount.max_amount %}
+                                        ${{ discount.max_amount }}
+                                    {% else %}
+                                        <span class="text-muted">No limit</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if discount.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{% url 'finance:discount_category_update' discount.pk %}" class="btn btn-sm btn-light" title="Edit">
+                                            <i class="bi bi-pencil text-warning"></i>
+                                        </a>
+                                        <a href="{% url 'finance:discount_category_delete' discount.pk %}" class="btn btn-sm btn-light" title="Delete">
+                                            <i class="bi bi-trash text-danger"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="bi bi-percent fs-1 d-block mb-3"></i>
+                                        <h5>No Discount Categories</h5>
+                                        <p>Create discount categories for students.</p>
+                                        <a href="{% url 'finance:discount_category_create' %}" class="btn btn-primary">
+                                            <i class="bi bi-plus-lg me-2"></i>Add Discount
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-circle {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+    }
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+</style>
+{% endblock %}

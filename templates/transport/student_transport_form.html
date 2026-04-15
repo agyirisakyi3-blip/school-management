@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Assign Transport - School Management{% endblock %}
+
+{% block page_title %}Assign Student Transport{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-people text-primary me-2"></i>
+                    Assign Student to Transport
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.student.label }}</label>
+                            {{ form.student }}
+                            {% if form.student.errors %}
+                            <small class="text-danger">{{ form.student.errors.0 }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.vehicle_route.label }}</label>
+                            {{ form.vehicle_route }}
+                            {% if form.vehicle_route.errors %}
+                            <small class="text-danger">{{ form.vehicle_route.errors.0 }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label">{{ form.pickup_point.label }}</label>
+                            {{ form.pickup_point }}
+                            <small class="text-muted">Enter pickup location details</small>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-check">
+                                {{ form.is_active }}
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                    Active
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-2"></i>Save
+                        </button>
+                        <a href="{% url 'transport:dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-lg me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

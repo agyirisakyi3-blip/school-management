@@ -1,0 +1,166 @@
+{% extends 'settings/dashboard.html' %}
+{% load crispy_forms_tags %}
+
+{% block settings_content %}
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-0"><i class="bi bi-palette text-warning me-2"></i>Theme Settings</h5>
+                <p class="text-muted small mb-0">Customize the look and feel of your system</p>
+            </div>
+            <a href="{% url 'settings:dashboard' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Back
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h6 class="text-muted mb-3"><i class="bi bi-sun me-2"></i>Appearance</h6>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small text-muted fw-bold">Theme</label>
+                    {{ form.theme }}
+                    <div class="form-text">Choose light, dark, or follow system settings</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small text-muted fw-bold">Layout</label>
+                    {{ form.layout }}
+                    <div class="form-text">Choose your preferred navigation style</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small text-muted fw-bold">Primary Color</label>
+                    <div class="input-group">
+                        {{ form.primary_color }}
+                        <span class="input-group-text color-preview" id="colorPreview" style="background-color: {{ form.primary_color.value|default:'#0d6efd' }};"></span>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h6 class="text-muted mb-3"><i class="bi bi-layout-sidebar me-2"></i>Sidebar</h6>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small text-muted fw-bold">Sidebar Background Color</label>
+                    <div class="input-group">
+                        {{ form.sidebar_color }}
+                        <span class="input-group-text color-preview" id="sidebarColorPreview" style="background-color: {{ form.sidebar_color.value|default:'#1e1e2d' }};"></span>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h6 class="text-muted mb-3"><i class="bi bi-toggle-on me-2"></i>Display Options</h6>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-check form-switch mb-3">
+                        {{ form.compact_mode }}
+                        <label class="form-check-label" for="{{ form.compact_mode.id_for_label }}">
+                            <strong>Compact Mode</strong>
+                            <small class="text-muted d-block">Reduce spacing for more content visibility</small>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-check form-switch mb-3">
+                        {{ form.box_shadow }}
+                        <label class="form-check-label" for="{{ form.box_shadow.id_for_label }}">
+                            <strong>Box Shadows</strong>
+                            <small class="text-muted d-block">Show subtle shadows on cards and elements</small>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-check form-switch mb-3">
+                        {{ form.border_radius }}
+                        <label class="form-check-label" for="{{ form.border_radius.id_for_label }}">
+                            <strong>Rounded Corners</strong>
+                            <small class="text-muted d-block">Apply border-radius to UI elements</small>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h6 class="text-muted mb-3"><i class="bi bi-grid me-2"></i>Color Presets</h6>
+                </div>
+                <div class="col-md-12">
+                    <div class="d-flex gap-3 flex-wrap">
+                        <button type="button" class="color-preset" data-color="#0d6efd" style="background-color: #0d6efd;" title="Blue"></button>
+                        <button type="button" class="color-preset" data-color="#6610f2" style="background-color: #6610f2;" title="Purple"></button>
+                        <button type="button" class="color-preset" data-color="#6f42c1" style="background-color: #6f42c1;" title="Indigo"></button>
+                        <button type="button" class="color-preset" data-color="#198754" style="background-color: #198754;" title="Green"></button>
+                        <button type="button" class="color-preset" data-color="#20c997" style="background-color: #20c997;" title="Teal"></button>
+                        <button type="button" class="color-preset" data-color="#fd7e14" style="background-color: #fd7e14;" title="Orange"></button>
+                        <button type="button" class="color-preset" data-color="#dc3545" style="background-color: #dc3545;" title="Red"></button>
+                        <button type="button" class="color-preset" data-color="#0dcaf0" style="background-color: #0dcaf0;" title="Cyan"></button>
+                        <button type="button" class="color-preset" style="background: linear-gradient(45deg, #667eea, #764ba2);" data-color="#667eea" title="Gradient Purple"></button>
+                        <button type="button" class="color-preset" style="background: linear-gradient(45deg, #f093fb, #f5576c);" data-color="#f093fb" title="Gradient Pink"></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                <a href="{% url 'settings:dashboard' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                <button type="submit" class="btn btn-warning px-4">
+                    <i class="bi bi-check-lg me-2"></i>Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .color-preview {
+        width: 45px;
+        border-left: none;
+    }
+    .color-preset {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    .color-preset:hover {
+        transform: scale(1.1);
+    }
+    #id_primary_color, #id_sidebar_color {
+        max-width: 150px;
+    }
+</style>
+
+{% block extra_js %}
+<script>
+    document.querySelectorAll('.color-preset').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.getElementById('id_primary_color').value = this.dataset.color;
+            document.getElementById('colorPreview').style.backgroundColor = this.dataset.color;
+        });
+    });
+    
+    document.getElementById('id_primary_color').addEventListener('input', function() {
+        document.getElementById('colorPreview').style.backgroundColor = this.value;
+    });
+    
+    document.getElementById('id_sidebar_color').addEventListener('input', function() {
+        document.getElementById('sidebarColorPreview').style.backgroundColor = this.value;
+    });
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}Parent Dashboard - School Management System{% endblock %}
+
+{% block page_title %}Parent Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="welcome-banner bg-gradient-info text-white p-4 rounded-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="mb-1">Welcome, {{ user.get_full_name }}!</h3>
+                    <p class="mb-0 opacity-75">Monitor your children's academic progress</p>
+                </div>
+                <div class="text-end d-none d-md-block">
+                    <i class="bi bi-house-heart fs-1 opacity-25"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 col-lg-4 mb-3">
+        <div class="stat-card primary">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ ward_students.count|default:"0" }}</div>
+                    <div class="stat-label">Children Enrolled</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-4 mb-3">
+        <div class="stat-card success">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    {% with ward_students|first as first_ward %}
+                    <div class="stat-value">{{ first_ward.attendance_pct|default:"0" }}%</div>
+                    {% endwith %}
+                    <div class="stat-label">Avg. Attendance</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-4 mb-3">
+        <div class="stat-card warning">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Pending Fees</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'communication:message_create' %}" class="btn btn-primary">
+                        <i class="bi bi-envelope me-2"></i> Contact School
+                    </a>
+                    <a href="{% url 'communication:announcement_list' %}" class="btn btn-success">
+                        <i class="bi bi-megaphone me-2"></i> View Announcements
+                    </a>
+                    <a href="{% url 'communication:message_inbox' %}" class="btn btn-info text-white">
+                        <i class="bi bi-inbox me-2"></i> My Messages
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-person-badge me-2"></i>My Children</h5>
+            </div>
+            <div class="card-body">
+                {% if ward_students %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Roll No</th>
+                                <th>Class</th>
+                                <th>Attendance</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in ward_students %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'students:student_detail' student.pk %}">
+                                        {{ student.user.get_full_name }}
+                                    </a>
+                                </td>
+                                <td>{{ student.student_id }}</td>
+                                <td>{{ student.current_class.name }} - {{ student.current_class.section }}</td>
+                                <td>
+                                    <span class="badge {% if student.attendance_pct >= 75 %}bg-success{% else %}bg-danger{% endif %}">
+                                        {{ student.attendance_pct }}%
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'academics:student_report' student.pk %}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-file-earmark-text"></i> Report
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="bi bi-people fs-1"></i>
+                    <p class="mt-2">No children linked to your account</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if ward_students %}
+{% for student in ward_students %}
+{% if student.recent_results %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>{{ student.user.get_full_name }}'s Recent Results</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Marks</th>
+                                <th>Grade</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in student.recent_results %}
+                            <tr>
+                                <td>{{ result.exam_schedule.subject.name }}</td>
+                                <td>
+                                    <span class="badge {% if result.marks_obtained >= result.exam_schedule.subject.passing_marks %}bg-success{% else %}bg-danger{% endif %}">
+                                        {{ result.marks_obtained }}/{{ result.exam_schedule.subject.passing_marks }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% with result.marks_obtained as marks %}
+                                    {% with result.exam_schedule.subject.passing_marks as max_marks %}
+                                    {% with marks|add:0 as percentage %}
+                                    {% if percentage >= 90 %}A+{% elif percentage >= 80 %}A{% elif percentage >= 70 %}B{% elif percentage >= 60 %}C{% elif percentage >= 50 %}D{% else %}F{% endif %}
+                                    {% endwith %}
+                                    {% endwith %}
+                                    {% endwith %}
+                                </td>
+                                <td>{{ result.created_at|date:"M d, Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endblock %}

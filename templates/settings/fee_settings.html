@@ -1,0 +1,159 @@
+{% extends 'settings/dashboard.html' %}
+{% load crispy_forms_tags %}
+
+{% block settings_content %}
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-0"><i class="bi bi-currency-dollar text-success me-2"></i>Fee Settings</h5>
+                <p class="text-muted small mb-0">Configure fee collection and payment policies</p>
+            </div>
+            <a href="{% url 'settings:dashboard' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Back
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h6 class="text-muted mb-3"><i class="bi bi-wallet2 me-2"></i>Payment Options</h6>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-check form-switch mb-3">
+                        {{ form.allow_partial_payment }}
+                        <label class="form-check-label" for="{{ form.allow_partial_payment.id_for_label }}">
+                            <strong>Allow Partial Payments</strong>
+                            <small class="text-muted d-block">Students can pay fees in installments</small>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <label class="form-label small text-muted fw-bold">Partial Payment Type</label>
+                    {{ form.partial_payment_type }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small text-muted fw-bold">Partial Payment Amount</label>
+                    {{ form.partial_payment_amount }}
+                    <div class="form-text" id="partialHelp">Minimum amount or percentage required</div>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h6 class="text-muted mb-3"><i class="bi bi-clock-history me-2"></i>Late Payment</h6>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-check form-switch mb-3">
+                        {{ form.late_fee_enabled }}
+                        <label class="form-check-label" for="{{ form.late_fee_enabled.id_for_label }}">
+                            <strong>Enable Late Fee</strong>
+                            <small class="text-muted d-block">Charge penalty for late payments</small>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4" id="lateFeeOptions">
+                <div class="col-md-4">
+                    <label class="form-label small text-muted fw-bold">Late Fee Type</label>
+                    {{ form.late_fee_type }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small text-muted fw-bold">Late Fee Amount</label>
+                    {{ form.late_fee_amount }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small text-muted fw-bold">Apply After (Days)</label>
+                    {{ form.late_fee_after_days }}
+                    <div class="form-text">Days after due date to apply late fee</div>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h6 class="text-muted mb-3"><i class="bi bi-receipt me-2"></i>Invoice Settings</h6>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small text-muted fw-bold">Invoice Prefix</label>
+                    {{ form.invoice_prefix }}
+                    <div class="form-text">Prefix for invoice numbers (e.g., INV-0001)</div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small text-muted fw-bold">Due Warning (Days Before)</label>
+                    {{ form.due_warning_days }}
+                    <div class="form-text">Days before due date to send reminder</div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="form-check form-switch mb-3">
+                        {{ form.auto_reminder }}
+                        <label class="form-check-label" for="{{ form.auto_reminder.id_for_label }}">
+                            <strong>Auto Reminder</strong>
+                            <small class="text-muted d-block">Send automatic payment reminders</small>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-success">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>Payment Tips:</strong>
+                <ul class="mb-0 mt-2">
+                    <li>Parents will receive email/SMS notifications for upcoming due dates</li>
+                    <li>Payment history is maintained for audit purposes</li>
+                    <li>Online payment integration available (Razorpay, PayPal, etc.)</li>
+                </ul>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                <a href="{% url 'settings:dashboard' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                <button type="submit" class="btn btn-success px-4">
+                    <i class="bi bi-check-lg me-2"></i>Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    function toggleLateFeeOptions() {
+        const isEnabled = document.getElementById('id_late_fee_enabled').checked;
+        document.getElementById('lateFeeOptions').style.opacity = isEnabled ? '1' : '0.5';
+        document.querySelectorAll('#lateFeeOptions input, #lateFeeOptions select').forEach(el => {
+            el.disabled = !isEnabled;
+        });
+    }
+    
+    function updatePartialHelp() {
+        const type = document.getElementById('id_partial_payment_type').value;
+        const help = document.getElementById('partialHelp');
+        if (type === 'percentage') {
+            help.textContent = 'Minimum percentage of total fee';
+        } else {
+            help.textContent = 'Minimum fixed amount required';
+        }
+    }
+    
+    document.getElementById('id_late_fee_enabled').addEventListener('change', toggleLateFeeOptions);
+    document.getElementById('id_partial_payment_type').addEventListener('change', updatePartialHelp);
+    
+    // Initialize
+    toggleLateFeeOptions();
+    updatePartialHelp();
+</script>
+{% endblock %}
+{% endblock %}

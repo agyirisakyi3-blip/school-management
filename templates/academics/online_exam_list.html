@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Online Exams - School Management System{% endblock %}
+
+{% block page_title %}Available Online Exams{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="bi bi-laptop text-primary me-2"></i>Online Exams</h5>
+                <p class="text-muted small mb-0">Take your exams online</p>
+            </div>
+            <div class="card-body">
+                {% if exams %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Exam</th>
+                                <th>Subject</th>
+                                <th>Date</th>
+                                <th>Duration</th>
+                                <th>Total Marks</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for exam in exams %}
+                            <tr>
+                                <td>
+                                    <h6 class="mb-0">{{ exam.exam.name }}</h6>
+                                    <small class="text-muted">{{ exam.exam.exam_type }}</small>
+                                </td>
+                                <td>{{ exam.subject.name }}</td>
+                                <td>{{ exam.exam_date|date:"d M Y" }}</td>
+                                <td>{{ exam.duration_minutes }} min</td>
+                                <td>{{ exam.total_marks }}</td>
+                                <td>
+                                    {% if exam.id in completed_exams %}
+                                    <span class="badge bg-success">Completed</span>
+                                    {% else %}
+                                    <span class="badge bg-primary">Available</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if exam.id in completed_exams %}
+                                    <a href="{% url 'academics:exam_result' exam.id %}" class="btn btn-sm btn-outline-success">
+                                        <i class="bi bi-check-circle me-1"></i>View Result
+                                    </a>
+                                    {% else %}
+                                    <a href="{% url 'academics:online_exam' exam.id %}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-pencil-square me-1"></i>Start Exam
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox text-muted fs-1 d-block mb-3"></i>
+                    <h5>No Online Exams Available</h5>
+                    <p class="text-muted">Check back later for upcoming exams.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

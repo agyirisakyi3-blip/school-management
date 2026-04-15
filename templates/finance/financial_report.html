@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Financial Report - School Management System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Financial Report</h2>
+    {% if user.is_admin_user %}
+    <a href="{% url 'finance:payment_list' %}" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left"></i> Back to Payments
+    </a>
+    {% endif %}
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5>Total Income</h5>
+                <h3>${{ total_income|default:"0.00" }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <h5>Total Expenses</h5>
+                <h3>${{ total_expenses|default:"0.00" }}</h3>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5>Net Balance</h5>
+                <h3>${{ net_balance|default:"0.00" }}</h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h4>Income Breakdown</h4>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in income_by_category %}
+                <tr>
+                    <td>{{ item.fee_structure__category__name|default:"N/A" }}</td>
+                    <td>${{ item.total|default:"0.00" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2" class="text-center text-muted">No income data available</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h4>Expense Breakdown</h4>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in expenses_by_category %}
+                <tr>
+                    <td>{{ item.category|default:"N/A" }}</td>
+                    <td>${{ item.total|default:"0.00" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2" class="text-center text-muted">No expense data available</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

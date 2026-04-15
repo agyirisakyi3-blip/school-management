@@ -1,0 +1,853 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - School Management System{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+{% if user.is_admin_user %}
+<!-- Admin Dashboard -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h4 class="mb-3"><i class="bi bi-grid-3x3-gap me-2"></i>Overview</h4>
+    </div>
+    
+    <!-- Students & Staff -->
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="stat-card primary">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ total_students|default:"0" }}</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+            </div>
+            <a href="{% url 'students:student_list' %}" class="stat-link">View all <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="stat-card success">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ total_teachers|default:"0" }}</div>
+                    <div class="stat-label">Total Teachers</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-person-badge"></i>
+                </div>
+            </div>
+            <a href="{% url 'teachers:teacher_list' %}" class="stat-link">View all <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="stat-card warning">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ total_classes|default:"0" }}</div>
+                    <div class="stat-label">Classes</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-collection"></i>
+                </div>
+            </div>
+            <a href="{% url 'students:class_list' %}" class="stat-link">View all <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="stat-card info">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ total_subjects|default:"0" }}</div>
+                    <div class="stat-label">Subjects</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-book"></i>
+                </div>
+            </div>
+            <a href="{% url 'students:subject_list' %}" class="stat-link">View all <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+</div>
+
+<!-- Finance Overview -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h4 class="mb-3"><i class="bi bi-cash-stack me-2"></i>Finance Overview</h4>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="stat-card success">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">${{ total_fees_collected|default:"0"|floatformat:0 }}</div>
+                    <div class="stat-label">Fees Collected</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-currency-dollar"></i>
+                </div>
+            </div>
+            <a href="{% url 'finance:payment_list' %}" class="stat-link">View all <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="stat-card danger">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">${{ total_fees_pending|default:"0"|floatformat:0 }}</div>
+                    <div class="stat-label">Pending Fees</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+            </div>
+            <a href="{% url 'finance:student_fee_list' %}" class="stat-link">View all <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="stat-card primary">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">${{ monthly_collections|default:"0"|floatformat:0 }}</div>
+                    <div class="stat-label">This Month</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="stat-card warning">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">${{ monthly_expenses|default:"0"|floatformat:0 }}</div>
+                    <div class="stat-label">Expenses</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+            </div>
+            <a href="{% url 'finance:expense_list' %}" class="stat-link">View all <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+</div>
+
+<!-- Fee Management -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h4 class="mb-3"><i class="bi bi-receipt me-2"></i>Fee Management</h4>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="stat-card info">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ total_fee_categories|default:"0" }}</div>
+                    <div class="stat-label">Fee Categories</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-folder"></i>
+                </div>
+            </div>
+            <a href="{% url 'finance:fee_category_list' %}" class="stat-link">Manage <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="stat-card primary">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ total_fee_particulars|default:"0" }}</div>
+                    <div class="stat-label">Fee Particulars</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-receipt"></i>
+                </div>
+            </div>
+            <a href="{% url 'finance:fee_particular_list' %}" class="stat-link">Manage <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="stat-card success">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ total_fee_groups|default:"0" }}</div>
+                    <div class="stat-label">Fee Groups</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-collection"></i>
+                </div>
+            </div>
+            <a href="{% url 'finance:fee_group_list' %}" class="stat-link">Manage <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="stat-card warning">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ total_discounts|default:"0" }}</div>
+                    <div class="stat-label">Discounts</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-percent"></i>
+                </div>
+            </div>
+            <a href="{% url 'finance:discount_category_list' %}" class="stat-link">Manage <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+</div>
+
+<!-- Academic Overview -->
+<div class="row mb-4">
+    <div class="col-12">
+        <h4 class="mb-3"><i class="bi bi-mortarboard me-2"></i>Academic Overview</h4>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="stat-card primary">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ total_exams|default:"0" }}</div>
+                    <div class="stat-label">Active Exams</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-file-text"></i>
+                </div>
+            </div>
+            <a href="{% url 'academics:exam_list' %}" class="stat-link">View all <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="stat-card info">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ upcoming_exams|default:"0" }}</div>
+                    <div class="stat-label">Upcoming Exams</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-calendar-event"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="stat-card success">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ today_attendance|default:"0" }}</div>
+                    <div class="stat-label">Attendance Today</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+            </div>
+            <a href="{% url 'academics:attendance_list' %}" class="stat-link">View all <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-3">
+        <div class="stat-card warning">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ total_results|default:"0" }}</div>
+                    <div class="stat-label">Results Recorded</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-bar-chart"></i>
+                </div>
+            </div>
+            <a href="{% url 'academics:result_list' %}" class="stat-link">View all <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="bi bi-lightning text-warning me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'students:student_create' %}" class="quick-action">
+                            <div class="quick-action-icon bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-person-plus"></i>
+                            </div>
+                            <h6 class="mb-1">Add Student</h6>
+                            <small class="text-muted">New admission</small>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'teachers:teacher_create' %}" class="quick-action">
+                            <div class="quick-action-icon bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-person-badge"></i>
+                            </div>
+                            <h6 class="mb-1">Add Teacher</h6>
+                            <small class="text-muted">New staff</small>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'students:class_create' %}" class="quick-action">
+                            <div class="quick-action-icon bg-info bg-opacity-10 text-info">
+                                <i class="bi bi-collection"></i>
+                            </div>
+                            <h6 class="mb-1">Add Class</h6>
+                            <small class="text-muted">New grade</small>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'finance:assign_fees' %}" class="quick-action">
+                            <div class="quick-action-icon bg-warning bg-opacity-10 text-warning">
+                                <i class="bi bi-currency-dollar"></i>
+                            </div>
+                            <h6 class="mb-1">Assign Fees</h6>
+                            <small class="text-muted">Generate fees</small>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'academics:attendance_bulk_create' %}" class="quick-action">
+                            <div class="quick-action-icon bg-danger bg-opacity-10 text-danger">
+                                <i class="bi bi-calendar-plus"></i>
+                            </div>
+                            <h6 class="mb-1">Mark Attendance</h6>
+                            <small class="text-muted">Daily roll call</small>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'finance:payment_create' %}" class="quick-action">
+                            <div class="quick-action-icon bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-credit-card"></i>
+                            </div>
+                            <h6 class="mb-1">Record Payment</h6>
+                            <small class="text-muted">Collect fee</small>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'communication:announcement_create' %}" class="quick-action">
+                            <div class="quick-action-icon bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-megaphone"></i>
+                            </div>
+                            <h6 class="mb-1">Announcement</h6>
+                            <small class="text-muted">Send notice</small>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <a href="{% url 'settings:dashboard' %}" class="quick-action">
+                            <div class="quick-action-icon bg-secondary bg-opacity-10 text-secondary">
+                                <i class="bi bi-gear"></i>
+                            </div>
+                            <h6 class="mb-1">Settings</h6>
+                            <small class="text-muted">Configuration</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="bi bi-bell text-danger me-2"></i>Notifications</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_announcements %}
+                    {% for announcement in recent_announcements %}
+                    <div class="p-3 border-bottom">
+                        <small class="text-muted">{{ announcement.created_at|date:"M d, Y" }}</small>
+                        <p class="mb-0 fw-medium">{{ announcement.title }}</p>
+                        <small class="text-muted">{{ announcement.content|truncatechars:60 }}</small>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="p-4 text-center text-muted">
+                        <i class="bi bi-bell-slash fs-1 d-block mb-2"></i>
+                        <p class="mb-0">No new notifications</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-person-plus text-success me-2"></i>Recent Students</h5>
+                <a href="{% url 'students:student_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_students %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 py-3">Student</th>
+                                <th class="border-0 py-3">Class</th>
+                                <th class="border-0 py-3">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for student in recent_students %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle-sm bg-primary text-white me-2">
+                                            {{ student.user.first_name|make_list|first|upper }}
+                                        </div>
+                                        <span>{{ student.user.get_full_name }}</span>
+                                    </div>
+                                </td>
+                                <td>{{ student.current_class.name|default:"-" }}</td>
+                                <td>{{ student.created_at|date:"M d" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-4 text-center text-muted">
+                    <i class="bi bi-people fs-1 d-block mb-2"></i>
+                    <p class="mb-0">No students yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-credit-card text-success me-2"></i>Recent Payments</h5>
+                <a href="{% url 'finance:payment_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_payments %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 py-3">Student</th>
+                                <th class="border-0 py-3">Amount</th>
+                                <th class="border-0 py-3">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for payment in recent_payments %}
+                            <tr>
+                                <td>{{ payment.student_fee.student.user.get_full_name }}</td>
+                                <td><span class="text-success fw-bold">${{ payment.amount }}</span></td>
+                                <td>{{ payment.payment_date|date:"M d" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="p-4 text-center text-muted">
+                    <i class="bi bi-credit-card fs-1 d-block mb-2"></i>
+                    <p class="mb-0">No payments yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif user.is_teacher %}
+<!-- Teacher Dashboard -->
+<div class="row mb-4">
+    <div class="col-md-6 col-lg-4 mb-3">
+        <div class="stat-card primary">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ my_students|default:"0" }}</div>
+                    <div class="stat-label">My Students</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-4 mb-3">
+        <div class="stat-card success">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ today_attendance|default:"0" }}</div>
+                    <div class="stat-label">Attendance Today</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-4 mb-3">
+        <div class="stat-card warning">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ pending_results|default:"0" }}</div>
+                    <div class="stat-label">Pending Results</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-list-task"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-6 col-md-4">
+                        <a href="{% url 'academics:attendance_bulk_create' %}" class="quick-action">
+                            <div class="quick-action-icon bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+                            <h6 class="mb-1">Take Attendance</h6>
+                            <small class="text-muted">Mark daily attendance</small>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <a href="{% url 'academics:result_create' %}" class="quick-action">
+                            <div class="quick-action-icon bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-file-earmark-plus"></i>
+                            </div>
+                            <h6 class="mb-1">Enter Results</h6>
+                            <small class="text-muted">Add exam scores</small>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <a href="{% url 'communication:message_create' %}" class="quick-action">
+                            <div class="quick-action-icon bg-warning bg-opacity-10 text-warning">
+                                <i class="bi bi-envelope"></i>
+                            </div>
+                            <h6 class="mb-1">Send Message</h6>
+                            <small class="text-muted">Contact parents</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="bi bi-bell me-2"></i>Notifications</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_announcements %}
+                    {% for announcement in recent_announcements %}
+                    <div class="p-3 border-bottom">
+                        <small class="text-muted">{{ announcement.created_at|date:"M d" }}</small>
+                        <p class="mb-0 fw-medium">{{ announcement.title }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="p-4 text-center text-muted">
+                    <i class="bi bi-bell-slash fs-4 d-block mb-2"></i>
+                    <p class="mb-0 small">No notifications</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif user.is_student %}
+<!-- Student Dashboard -->
+<div class="row mb-4">
+    <div class="col-md-6 col-lg-4 mb-3">
+        <div class="stat-card primary">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ attendance_percentage|default:"0" }}%</div>
+                    <div class="stat-label">Attendance</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-4 mb-3">
+        <div class="stat-card success">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ average_score|default:"0" }}%</div>
+                    <div class="stat-label">Average Score</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-bar-chart"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-4 mb-3">
+        <div class="stat-card warning">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ upcoming_exams|default:"0" }}</div>
+                    <div class="stat-label">Upcoming Exams</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-file-text"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-6 col-md-4">
+                        <a href="{% url 'academics:timetable_list' %}" class="quick-action">
+                            <div class="quick-action-icon bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-calendar-week"></i>
+                            </div>
+                            <h6 class="mb-1">Timetable</h6>
+                            <small class="text-muted">View schedule</small>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <a href="{% url 'academics:result_list' %}" class="quick-action">
+                            <div class="quick-action-icon bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-bar-chart"></i>
+                            </div>
+                            <h6 class="mb-1">My Results</h6>
+                            <small class="text-muted">View grades</small>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <a href="{% url 'finance:student_fee_list' %}" class="quick-action">
+                            <div class="quick-action-icon bg-warning bg-opacity-10 text-warning">
+                                <i class="bi bi-wallet2"></i>
+                            </div>
+                            <h6 class="mb-1">My Fees</h6>
+                            <small class="text-muted">Fee status</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="bi bi-bell me-2"></i>Notifications</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_announcements %}
+                    {% for announcement in recent_announcements %}
+                    <div class="p-3 border-bottom">
+                        <small class="text-muted">{{ announcement.created_at|date:"M d" }}</small>
+                        <p class="mb-0 fw-medium">{{ announcement.title }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="p-4 text-center text-muted">
+                    <i class="bi bi-bell-slash fs-4 d-block mb-2"></i>
+                    <p class="mb-0 small">No notifications</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% elif user.is_parent %}
+<!-- Parent Dashboard -->
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="stat-card primary">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="stat-value">{{ ward_students.count }}</div>
+                    <div class="stat-label">My Children</div>
+                </div>
+                <div class="stat-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-6 col-md-4">
+                        <a href="{% url 'communication:message_create' %}" class="quick-action">
+                            <div class="quick-action-icon bg-primary bg-opacity-10 text-primary">
+                                <i class="bi bi-envelope"></i>
+                            </div>
+                            <h6 class="mb-1">Contact School</h6>
+                            <small class="text-muted">Send message</small>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <a href="{% url 'communication:announcement_list' %}" class="quick-action">
+                            <div class="quick-action-icon bg-success bg-opacity-10 text-success">
+                                <i class="bi bi-megaphone"></i>
+                            </div>
+                            <h6 class="mb-1">Announcements</h6>
+                            <small class="text-muted">View updates</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="bi bi-bell me-2"></i>Notifications</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_announcements %}
+                    {% for announcement in recent_announcements %}
+                    <div class="p-3 border-bottom">
+                        <small class="text-muted">{{ announcement.created_at|date:"M d" }}</small>
+                        <p class="mb-0 fw-medium">{{ announcement.title }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="p-4 text-center text-muted">
+                    <i class="bi bi-bell-slash fs-4 d-block mb-2"></i>
+                    <p class="mb-0 small">No notifications</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: transform 0.2s, box-shadow 0.2s;
+        height: 100%;
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+    .stat-card.primary { border-left: 4px solid #0d6efd; }
+    .stat-card.success { border-left: 4px solid #198754; }
+    .stat-card.warning { border-left: 4px solid #ffc107; }
+    .stat-card.info { border-left: 4px solid #0dcaf0; }
+    .stat-card.danger { border-left: 4px solid #dc3545; }
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #333;
+    }
+    .stat-label {
+        font-size: 14px;
+        color: #666;
+    }
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+    .stat-card.primary .stat-icon { background: rgba(13, 110, 253, 0.1); color: #0d6efd; }
+    .stat-card.success .stat-icon { background: rgba(25, 135, 84, 0.1); color: #198754; }
+    .stat-card.warning .stat-icon { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
+    .stat-card.info .stat-icon { background: rgba(13, 202, 240, 0.1); color: #0dcaf0; }
+    .stat-card.danger .stat-icon { background: rgba(220, 53, 69, 0.1); color: #dc3545; }
+    .stat-link {
+        display: block;
+        margin-top: 10px;
+        font-size: 13px;
+        color: #666;
+        text-decoration: none;
+    }
+    .stat-link:hover { color: #0d6efd; }
+    .quick-action {
+        display: block;
+        text-align: center;
+        padding: 15px;
+        border-radius: 10px;
+        background: #f8f9fa;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.2s;
+    }
+    .quick-action:hover {
+        background: #e9ecef;
+        transform: translateY(-2px);
+    }
+    .quick-action-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 10px;
+        font-size: 22px;
+    }
+    .quick-action h6 { color: #333; }
+    .avatar-circle-sm {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 12px;
+    }
+</style>
+{% endblock %}

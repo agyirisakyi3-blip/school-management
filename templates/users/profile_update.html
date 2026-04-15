@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Update Profile Picture - School Management System{% endblock %}
+{% block page_title %}Update Profile Picture{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4 text-center">
+                <div class="mb-4">
+                    {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="{{ user.get_full_name }}" class="rounded-circle img-thumbnail profile-update-img">
+                    {% else %}
+                        <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center profile-icon-placeholder">
+                            <i class="bi bi-person text-secondary"></i>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <h4 class="mb-4">Change Profile Picture</h4>
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4 text-start">
+                        <label class="form-label fw-semibold">Select Image</label>
+                        {{ form.profile_picture }}
+                        <div class="form-text mt-2 text-muted">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Recommended: Square image, max size 2MB (JPG, PNG).
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-cloud-upload me-2"></i>Upload Photo
+                        </button>
+                        <a href="{% url 'users:dashboard' %}" class="btn btn-outline-secondary">
+                            Back to Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

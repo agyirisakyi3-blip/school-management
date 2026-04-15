@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Route Assignments - Transport Management{% endblock %}
+
+{% block page_title %}Route Assignments{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <div>
+                    <h5 class="mb-0"><i class="bi bi-link-45deg text-primary me-2"></i>Route Assignments</h5>
+                    <p class="text-muted small mb-0">Assign vehicles to routes</p>
+                </div>
+                {% if user.is_admin_user %}
+                <div>
+                    <a href="{% url 'transport:vehicle_route_create' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-lg me-2"></i>Assign Route
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 py-3">Route</th>
+                                <th class="border-0 py-3">Vehicle</th>
+                                <th class="border-0 py-3">Pickup Time</th>
+                                <th class="border-0 py-3">Drop Time</th>
+                                <th class="border-0 py-3">Fare</th>
+                                <th class="border-0 py-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for assignment in assignments %}
+                            <tr>
+                                <td><strong>{{ assignment.route.name }}</strong><br><small class="text-muted">{{ assignment.route.route_from }} - {{ assignment.route.route_to }}</small></td>
+                                <td><code>{{ assignment.vehicle.vehicle_number }}</code></td>
+                                <td>{{ assignment.pickup_time|default:"-" }}</td>
+                                <td>{{ assignment.drop_time|default:"-" }}</td>
+                                <td>${{ assignment.fare }}</td>
+                                <td>
+                                    {% if user.is_admin_user %}
+                                    <div class="btn-group">
+                                        <a href="{% url 'transport:vehicle_route_update' assignment.pk %}" class="btn btn-sm btn-light">
+                                            <i class="bi bi-pencil text-warning"></i>
+                                        </a>
+                                        <a href="{% url 'transport:vehicle_route_delete' assignment.pk %}" class="btn btn-sm btn-light">
+                                            <i class="bi bi-trash text-danger"></i>
+                                        </a>
+                                    </div>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <i class="bi bi-link-45deg fs-1 d-block mb-3 text-muted"></i>
+                                    <h5>No Assignments Found</h5>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

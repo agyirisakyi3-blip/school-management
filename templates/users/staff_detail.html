@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ staff.user.get_full_name }} - Staff Details{% endblock %}
+
+{% block page_title %}Staff Details{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body text-center">
+                {% if staff.user.profile_picture %}
+                <img src="{{ staff.user.profile_picture.url }}" class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                {% else %}
+                <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center text-white mb-3" style="width: 150px; height: 150px; font-size: 3rem;">
+                    {{ staff.user.first_name|make_list|first|upper }}
+                </div>
+                {% endif %}
+                <h4 class="mb-1">{{ staff.user.get_full_name }}</h4>
+                <p class="text-muted mb-2">{{ staff.user.get_staff_type_display_name }}</p>
+                <span class="badge {% if staff.is_active %}bg-success{% else %}bg-secondary{% endif %} mb-3">
+                    {% if staff.is_active %}Active{% else %}Inactive{% endif %}
+                </span>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'users:staff_update' staff.pk %}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-pencil me-2"></i>Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="bi bi-person-badge me-2"></i>Personal Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="small text-muted d-block">Staff ID</label>
+                        <span class="fw-medium">{{ staff.staff_id }}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="small text-muted d-block">Email</label>
+                        <span class="fw-medium">{{ staff.user.email }}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="small text-muted d-block">Phone</label>
+                        <span class="fw-medium">{{ staff.user.phone|default:"-" }}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="small text-muted d-block">Gender</label>
+                        <span class="fw-medium">{{ staff.user.get_gender_display|default:"-" }}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="small text-muted d-block">Date of Birth</label>
+                        <span class="fw-medium">{{ staff.user.date_of_birth|date:"d M Y"|default:"-" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="bi bi-briefcase me-2"></i>Employment Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="small text-muted d-block">Department</label>
+                        <span class="fw-medium">{{ staff.department|default:"-" }}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="small text-muted d-block">Designation</label>
+                        <span class="fw-medium">{{ staff.designation|default:"-" }}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="small text-muted d-block">Employment Date</label>
+                        <span class="fw-medium">{{ staff.employment_date|date:"d M Y"|default:"-" }}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="small text-muted d-block">Contract Type</label>
+                        <span class="fw-medium">{{ staff.get_contract_type_display|default:"-" }}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="small text-muted d-block">Shift Timing</label>
+                        <span class="fw-medium">{{ staff.shift_timing|default:"-" }}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="small text-muted d-block">Salary</label>
+                        <span class="fw-medium">₵{{ staff.salary|default:"0" }}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="small text-muted d-block">Experience</label>
+                        <span class="fw-medium">{{ staff.experience_years }} years</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0"><i class="bi bi-telephone me-2"></i>Emergency Contact</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="small text-muted d-block">Contact Name</label>
+                        <span class="fw-medium">{{ staff.emergency_contact_name|default:"-" }}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="small text-muted d-block">Contact Phone</label>
+                        <span class="fw-medium">{{ staff.emergency_contact_phone|default:"-" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

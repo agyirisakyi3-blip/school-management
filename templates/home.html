@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+
+{% block title %}School Management System{% endblock %}
+
+{% block auth_content %}
+<div class="landing-page">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container">
+                <a class="navbar-brand fw-bold" href="#">
+                    <i class="bi bi-mortarboard-fill me-2"></i>SchoolMS
+                </a>
+                <div class="d-flex">
+                    <a href="{% url 'users:login' %}" class="btn btn-outline-light me-2">Login</a>
+                </div>
+            </div>
+        </nav>
+        
+        <div class="container mt-5">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-3 fw-bold text-white mb-4">
+                        Merging Digitalization<br>
+                        <span class="text-warning">with Education</span>
+                    </h1>
+                    <p class="lead text-white mb-4">
+                        Now evolve with the pace of change with a comprehensive school management system that offers real-time insights to efficiently manage operations through a simple and easy to use dashboard.
+                    </p>
+                    <a href="{% url 'users:login' %}" class="btn btn-warning btn-lg px-5">
+                        Get Started <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                </div>
+                <div class="col-lg-6 text-center mt-5 mt-lg-0">
+                    <div class="dashboard-preview">
+                        <div class="dashboard-mockup bg-white rounded-3 shadow-lg p-4">
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <div class="stat-card primary">
+                                        <div class="stat-icon"><i class="bi bi-people"></i></div>
+                                        <div class="stat-value">1,234</div>
+                                        <div class="stat-label">Students</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-card success">
+                                        <div class="stat-icon"><i class="bi bi-person-badge"></i></div>
+                                        <div class="stat-value">89</div>
+                                        <div class="stat-label">Teachers</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-card warning">
+                                        <div class="stat-icon"><i class="bi bi-collection"></i></div>
+                                        <div class="stat-value">24</div>
+                                        <div class="stat-label">Classes</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-card info">
+                                        <div class="stat-icon"><i class="bi bi-currency-dollar"></i></div>
+                                        <div class="stat-value">95%</div>
+                                        <div class="stat-label">Collection</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Features Section -->
+    <section class="py-5 bg-white">
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Powerful Features</h2>
+                <p class="text-muted">Everything you need to manage your school efficiently</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-primary bg-opacity-10 text-primary mx-auto mb-3">
+                                <i class="bi bi-people fs-1"></i>
+                            </div>
+                            <h5 class="fw-bold">Student Management</h5>
+                            <p class="text-muted mb-0">Complete student profiles, enrollment, and class assignment</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-success bg-opacity-10 text-success mx-auto mb-3">
+                                <i class="bi bi-calendar-check fs-1"></i>
+                            </div>
+                            <h5 class="fw-bold">Attendance Tracking</h5>
+                            <p class="text-muted mb-0">Daily attendance with real-time monitoring</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-warning bg-opacity-10 text-warning mx-auto mb-3">
+                                <i class="bi bi-bar-chart fs-1"></i>
+                            </div>
+                            <h5 class="fw-bold">Exam & Results</h5>
+                            <p class="text-muted mb-0">Comprehensive exam management and grading</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-info bg-opacity-10 text-info mx-auto mb-3">
+                                <i class="bi bi-currency-dollar fs-1"></i>
+                            </div>
+                            <h5 class="fw-bold">Fee Management</h5>
+                            <p class="text-muted mb-0">Track fees, payments, and generate reports</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Role Cards Section -->
+    <section class="py-5">
+        <div class="container py-5">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Multiple Role Dashboards</h2>
+                <p class="text-muted">Tailored experiences for everyone</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3">
+                    <div class="card role-card admin">
+                        <div class="card-body text-center text-white p-5">
+                            <i class="bi bi-shield-check display-1 mb-3"></i>
+                            <h4 class="fw-bold">Admin</h4>
+                            <p>Full control over all school operations</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card role-card teacher">
+                        <div class="card-body text-center text-white p-5">
+                            <i class="bi bi-mortarboard display-1 mb-3"></i>
+                            <h4 class="fw-bold">Teacher</h4>
+                            <p>Manage classes, attendance, and results</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card role-card student">
+                        <div class="card-body text-center text-white p-5">
+                            <i class="bi bi-person display-1 mb-3"></i>
+                            <h4 class="fw-bold">Student</h4>
+                            <p>View results, attendance, and timetable</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3">
+                    <div class="card role-card parent">
+                        <div class="card-body text-center text-white p-5">
+                            <i class="bi bi-heart display-1 mb-3"></i>
+                            <h4 class="fw-bold">Parent</h4>
+                            <p>Monitor child's progress and activities</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="py-5 bg-primary">
+        <div class="container py-5 text-center text-white">
+            <h2 class="fw-bold mb-4">Ready to Transform Your School?</h2>
+            <p class="lead mb-4">Start managing your school efficiently today</p>
+            <a href="{% url 'users:login' %}" class="btn btn-warning btn-lg px-5">
+                Get Started Now <i class="bi bi-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-mortarboard-fill me-2"></i>SchoolMS
+                    </h5>
+                    <p class="text-muted mb-0">Comprehensive school management solution</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="text-muted mb-0">&copy; 2024 SchoolMS. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+
+<style>
+    .landing-page {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .hero-section {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        padding-bottom: 5rem;
+    }
+    
+    .dashboard-preview {
+        perspective: 1000px;
+    }
+    
+    .dashboard-mockup {
+        transform: rotateY(-10deg) rotateX(10deg);
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: rotateY(-10deg) rotateX(10deg); }
+        50% { transform: rotateY(-5deg) rotateX(5deg); }
+    }
+    
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .role-card {
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+    }
+    
+    .role-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+    
+    .role-card.admin { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
+    .role-card.teacher { background: linear-gradient(135deg, #059669, #10b981); }
+    .role-card.student { background: linear-gradient(135deg, #d97706, #f59e0b); }
+    .role-card.parent { background: linear-gradient(135deg, #0891b2, #06b6d4); }
+</style>
+{% endblock %}

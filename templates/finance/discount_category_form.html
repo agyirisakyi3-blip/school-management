@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title|default:"Discount Category" }} - School Management System{% endblock %}
+
+{% block page_title %}{{ title|default:"Discount Category" }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <div>
+                    <h5 class="mb-0"><i class="bi bi-percent text-warning me-2"></i>{% if form.instance.pk %}Edit{% else %}Add{% endif %} Discount Category</h5>
+                    <p class="text-muted small mb-0">Create discounts for student fee waivers</p>
+                </div>
+                <a href="{% url 'finance:discount_category_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Back
+                </a>
+            </div>
+            <div class="card-body">
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small text-muted fw-bold">Discount Name <span class="text-danger">*</span></label>
+                            {{ form.name }}
+                            <div class="form-text">e.g., Sibling Discount, Merit Scholarship, Staff Child</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-muted fw-bold">Code <span class="text-danger">*</span></label>
+                            {{ form.code }}
+                            <div class="form-text">Unique identifier (e.g., SIBLING_20)</div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label small text-muted fw-bold">Discount Type <span class="text-danger">*</span></label>
+                            {{ form.discount_type }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small text-muted fw-bold">Value <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                {% if form.discount_type.value == 'percentage' %}
+                                {{ form.value }}
+                                <span class="input-group-text">%</span>
+                                {% else %}
+                                <span class="input-group-text">$</span>
+                                {{ form.value }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small text-muted fw-bold">Max Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.max_amount }}
+                            </div>
+                            <div class="form-text">For percentage type (optional)</div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small text-muted fw-bold">Description</label>
+                        {{ form.description }}
+                        <div class="form-text">Optional description of this discount</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-check form-switch">
+                            {{ form.is_active }}
+                            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                <strong>Active</strong>
+                                <small class="text-muted d-block">Discount is available for assignment</small>
+                            </label>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'finance:discount_category_list' %}" class="btn btn-outline-secondary px-4">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-warning px-4">
+                            <i class="bi bi-check-lg me-2"></i>
+                            {% if form.instance.pk %}Update{% else %}Create{% endif %} Discount
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 10px 15px;
+        border: 1px solid #e2e8f0;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: var(--bs-primary);
+        box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.15);
+    }
+    label.form-label {
+        margin-bottom: 6px;
+    }
+</style>
+{% endblock %}

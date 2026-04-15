@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ notification.title }} - School Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h4>{{ notification.title }}</h4>
+                <small>{{ notification.created_at }}</small>
+            </div>
+            <div class="card-body">
+                <p>{{ notification.message }}</p>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'communication:notification_list' %}" class="btn btn-secondary">Back to Notifications</a>
+                {% if notification.link %}
+                <a href="{{ notification.link }}" class="btn btn-primary">View Details</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

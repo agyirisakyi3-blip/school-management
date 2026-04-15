@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title|default:"Fee Group" }} - School Management System{% endblock %}
+
+{% block page_title %}{{ title|default:"Fee Group" }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 offset-md-1">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <div>
+                    <h5 class="mb-0"><i class="bi bi-collection text-info me-2"></i>{% if form.instance.pk %}Edit{% else %}Create{% endif %} Fee Group</h5>
+                    <p class="text-muted small mb-0">Bundle fee particulars for easy assignment to classes</p>
+                </div>
+                <a href="{% url 'finance:fee_group_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Back
+                </a>
+            </div>
+            <div class="card-body">
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small text-muted fw-bold">Group Name <span class="text-danger">*</span></label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                            <div class="invalid-feedback d-block">{{ form.name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small text-muted fw-bold">Code <span class="text-danger">*</span></label>
+                            {{ form.code }}
+                            {% if form.code.errors %}
+                            <div class="invalid-feedback d-block">{{ form.code.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">Unique identifier (e.g., JSS1_FEES, SS2_FULL)</div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label small text-muted fw-bold">Academic Year <span class="text-danger">*</span></label>
+                            {{ form.academic_year }}
+                            {% if form.academic_year.errors %}
+                            <div class="invalid-feedback d-block">{{ form.academic_year.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small text-muted fw-bold">Description</label>
+                        {{ form.description }}
+                        <div class="form-text">Optional description of this fee group</div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h6 class="mb-0"><i class="bi bi-list-check text-info me-2"></i>Fee Particulars</h6>
+                                <small class="text-muted">Select the fee particulars to include in this group</small>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="selectAll">
+                                <label class="form-check-label" for="selectAll">Select All</label>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            {% for particular in particulars %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card border {% if particular.pk in selected_particulars %}border-primary bg-light{% endif %}">
+                                    <div class="card-body py-2">
+                                        <div class="form-check">
+                                            <input class="form-check-input particular-checkbox" type="checkbox" 
+                                                   name="particulars" value="{{ particular.pk }}" 
+                                                   id="particular{{ particular.pk }}"
+                                                   {% if particular.pk in selected_particulars %}checked{% endif %}>
+                                            <label class="form-check-label w-100" for="particular{{ particular.pk }}">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <strong>{{ particular.name }}</strong>
+                                                        <small class="d-block text-muted">{{ particular.category.name }}</small>
+                                                    </div>
+                                                    <span class="badge bg-success">${{ particular.amount }}</span>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-12">
+                                <div class="alert alert-warning">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    No fee particulars available. 
+                                    <a href="{% url 'finance:fee_particular_create' %}">Create fee particulars first</a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'finance:fee_group_list' %}" class="btn btn-outline-secondary px-4">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-info px-4">
+                            <i class="bi bi-check-lg me-2"></i>
+                            {% if form.instance.pk %}Update{% else %}Create{% endif %} Fee Group
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 10px 15px;
+        border: 1px solid #e2e8f0;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: var(--bs-primary);
+        box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.15);
+    }
+    label.form-label {
+        margin-bottom: 6px;
+    }
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+</style>
+
+{% block extra_js %}
+<script>
+    document.getElementById('selectAll').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.particular-checkbox');
+        checkboxes.forEach(cb => {
+            cb.checked = this.checked;
+            const card = cb.closest('.card');
+            if (this.checked) {
+                card.classList.add('border-primary', 'bg-light');
+            } else {
+                card.classList.remove('border-primary', 'bg-light');
+            }
+        });
+    });
+
+    document.querySelectorAll('.particular-checkbox').forEach(cb => {
+        cb.addEventListener('change', function() {
+            const card = this.closest('.card');
+            if (this.checked) {
+                card.classList.add('border-primary', 'bg-light');
+            } else {
+                card.classList.remove('border-primary', 'bg-light');
+            }
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %}

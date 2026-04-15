@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Assign Fees - School Management System{% endblock %}
+
+{% block page_title %}Assign Fees to Classes{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <div>
+                    <h5 class="mb-0"><i class="bi bi-check-all text-success me-2"></i>Assign Fee Group to Class</h5>
+                    <p class="text-muted small mb-0">Select a class and fee group to assign fees</p>
+                </div>
+                <a href="{% url 'finance:class_fee_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Back
+                </a>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label small text-muted fw-bold">Select Class <span class="text-danger">*</span></label>
+                        <select name="class_id" class="form-select form-select-lg" required>
+                            <option value="">-- Select a Class --</option>
+                            {% for cls in classes %}
+                            <option value="{{ cls.pk }}">{{ cls.name }} ({{ cls.code }})</option>
+                            {% empty %}
+                            <option value="" disabled>No classes available</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small text-muted fw-bold">Select Fee Group <span class="text-danger">*</span></label>
+                        <select name="fee_group_id" class="form-select form-select-lg" required>
+                            <option value="">-- Select a Fee Group --</option>
+                            {% for group in fee_groups %}
+                            <option value="{{ group.pk }}" {% if request.GET.group == group.pk|stringformat:"s" %}selected{% endif %}>
+                                {{ group.name }} - ${{ group.get_total_amount }} ({{ group.academic_year.name }})
+                            </option>
+                            {% empty %}
+                            <option value="" disabled>No fee groups available</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>What happens next?</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Fees will be assigned to all active students in the selected class</li>
+                            <li>Monthly fees will be generated for the entire academic year</li>
+                            <li>One-time fees will be generated with the annual due date</li>
+                            <li>You can view the assigned fees in Student Fees section</li>
+                        </ul>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'finance:class_fee_list' %}" class="btn btn-outline-secondary px-4">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-success px-4">
+                            <i class="bi bi-check-all me-2"></i>Assign Fees
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-select-lg {
+        padding: 12px 15px;
+        font-size: 1.1rem;
+    }
+</style>
+{% endblock %}

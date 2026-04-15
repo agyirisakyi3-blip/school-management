@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if object %}Edit Assignment{% else %}Assign Route{% endif %} - School Management{% endblock %}
+
+{% block page_title %}{% if object %}Edit Assignment{% else %}Assign Route{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0">
+                    <i class="bi bi-link-45deg text-primary me-2"></i>
+                    {% if object %}Edit Route Assignment{% else %}Assign Route to Vehicle{% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.route.label }}</label>
+                            {{ form.route }}
+                            {% if form.route.errors %}
+                            <small class="text-danger">{{ form.route.errors.0 }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.vehicle.label }}</label>
+                            {{ form.vehicle }}
+                            {% if form.vehicle.errors %}
+                            <small class="text-danger">{{ form.vehicle.errors.0 }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.driver.label }}</label>
+                            {{ form.driver }}
+                            <small class="text-muted">Optional - select a teacher as supervisor</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.fare.label }}</label>
+                            {{ form.fare }}
+                            {% if form.fare.errors %}
+                            <small class="text-danger">{{ form.fare.errors.0 }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.pickup_time.label }}</label>
+                            {{ form.pickup_time }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.drop_time.label }}</label>
+                            {{ form.drop_time }}
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-check">
+                                {{ form.is_active }}
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                    Active
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-2"></i>Save
+                        </button>
+                        <a href="{% url 'transport:dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-lg me-2"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+
+{% block title %}Front Office - School Management{% endblock %}
+
+{% block page_title %}Front Office Management{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <div>
+                    <h5 class="mb-0"><i class="bi bi-building text-primary me-2"></i>Front Office</h5>
+                    <p class="text-muted small mb-0">Manage admissions, visitors and complaints</p>
+                </div>
+                <div>
+                    <a href="{% url 'frontdesk:query_create' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-lg me-2"></i>New Admission Query
+                    </a>
+                    <a href="{% url 'frontdesk:visitor_create' %}" class="btn btn-outline-primary">
+                        <i class="bi bi-person-plus me-2"></i>Log Visitor
+                    </a>
+                    <a href="{% url 'frontdesk:complaint_create' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-exclamation-circle me-2"></i>Register Complaint
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <ul class="nav nav-tabs mb-4" id="frontdeskTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="queries-tab" data-bs-toggle="tab" data-bs-target="#queries" type="button">
+                            <i class="bi bi-chat-left-text me-2"></i>Admission Queries
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="visitors-tab" data-bs-toggle="tab" data-bs-target="#visitors" type="button">
+                            <i class="bi bi-people me-2"></i>Visitors
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="complaints-tab" data-bs-toggle="tab" data-bs-target="#complaints" type="button">
+                            <i class="bi bi-exclamation-triangle me-2"></i>Complaints
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="frontdeskTabsContent">
+                    <!-- Admission Queries Tab -->
+                    <div class="tab-pane fade show active" id="queries" role="tabpanel">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="border-0 py-3">Name</th>
+                                        <th class="border-0 py-3">Contact</th>
+                                        <th class="border-0 py-3">Class</th>
+                                        <th class="border-0 py-3">Status</th>
+                                        <th class="border-0 py-3">Date</th>
+                                        <th class="border-0 py-3">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for query in queries %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ query.name }}</strong><br>
+                                            <small class="text-muted">{{ query.email }}</small>
+                                        </td>
+                                        <td>{{ query.phone }}</td>
+                                        <td>{{ query.class_interested|default:"-" }}</td>
+                                        <td>
+                                            <span class="badge bg-{% if query.status == 'admitted' %}success{% elif query.status == 'rejected' %}danger{% elif query.status == 'contacted' %}info{% else %}warning{% endif %}">
+                                                {{ query.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ query.created_at|date:"M d, Y" }}</td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="{% url 'frontdesk:query_update' query.pk %}" class="btn btn-sm btn-light">
+                                                    <i class="bi bi-pencil text-warning"></i>
+                                                </a>
+                                                {% if user.is_admin_user %}
+                                                <a href="{% url 'frontdesk:query_delete' query.pk %}" class="btn btn-sm btn-light">
+                                                    <i class="bi bi-trash text-danger"></i>
+                                                </a>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5">
+                                            <i class="bi bi-chat-left-text fs-1 d-block mb-3 text-muted"></i>
+                                            <h5>No Admission Queries</h5>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Visitors Tab -->
+                    <div class="tab-pane fade" id="visitors" role="tabpanel">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="border-0 py-3">Name</th>
+                                        <th class="border-0 py-3">Purpose</th>
+                                        <th class="border-0 py-3">Person to Meet</th>
+                                        <th class="border-0 py-3">Check In</th>
+                                        <th class="border-0 py-3">Check Out</th>
+                                        <th class="border-0 py-3">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for visitor in visitors %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ visitor.name }}</strong><br>
+                                            <small class="text-muted">{{ visitor.phone|default:"-" }}</small>
+                                        </td>
+                                        <td>{{ visitor.purpose }}</td>
+                                        <td>{{ visitor.person_to_meet|default:"-" }}</td>
+                                        <td>{{ visitor.check_in|date:"M d, H:i" }}</td>
+                                        <td>
+                                            {% if visitor.check_out %}
+                                            {{ visitor.check_out|date:"M d, H:i" }}
+                                            {% else %}
+                                            <span class="badge bg-success">Active</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                {% if not visitor.check_out %}
+                                                <form method="post" action="{% url 'frontdesk:visitor_checkout' visitor.pk %}" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-light" title="Check Out">
+                                                        <i class="bi bi-box-arrow-right text-success"></i>
+                                                    </button>
+                                                </form>
+                                                {% endif %}
+                                                {% if user.is_admin_user %}
+                                                <a href="{% url 'frontdesk:visitor_delete' visitor.pk %}" class="btn btn-sm btn-light">
+                                                    <i class="bi bi-trash text-danger"></i>
+                                                </a>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5">
+                                            <i class="bi bi-people fs-1 d-block mb-3 text-muted"></i>
+                                            <h5>No Visitors Today</h5>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Complaints Tab -->
+                    <div class="tab-pane fade" id="complaints" role="tabpanel">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="border-0 py-3">Subject</th>
+                                        <th class="border-0 py-3">Type</th>
+                                        <th class="border-0 py-3">Complainant</th>
+                                        <th class="border-0 py-3">Priority</th>
+                                        <th class="border-0 py-3">Status</th>
+                                        <th class="border-0 py-3">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for complaint in complaints %}
+                                    <tr>
+                                        <td><strong>{{ complaint.subject }}</strong></td>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ complaint.get_complaint_type_display }}</span>
+                                        </td>
+                                        <td>{{ complaint.complainant_name }}</td>
+                                        <td>
+                                            <span class="badge bg-{% if complaint.priority == 'urgent' %}danger{% elif complaint.priority == 'high' %}warning{% elif complaint.priority == 'medium' %}info{% else %}secondary{% endif %}">
+                                                {{ complaint.get_priority_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{% if complaint.status == 'resolved' %}success{% elif complaint.status == 'closed' %}secondary{% elif complaint.status == 'in_progress' %}info{% else %}warning{% endif %}">
+                                                {{ complaint.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="{% url 'frontdesk:complaint_update' complaint.pk %}" class="btn btn-sm btn-light">
+                                                    <i class="bi bi-pencil text-warning"></i>
+                                                </a>
+                                                {% if user.is_admin_user %}
+                                                <a href="{% url 'frontdesk:complaint_delete' complaint.pk %}" class="btn btn-sm btn-light">
+                                                    <i class="bi bi-trash text-danger"></i>
+                                                </a>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5">
+                                            <i class="bi bi-exclamation-triangle fs-1 d-block mb-3 text-muted"></i>
+                                            <h5>No Complaints</h5>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

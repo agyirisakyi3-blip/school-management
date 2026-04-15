@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ exam.name }} - Exam Details{% endblock %}
+
+{% block page_title %}Exam Details{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2><i class="bi bi-file-text me-2"></i>{{ exam.name }}</h2>
+        <span class="badge bg-{% if exam.is_completed %}secondary{% elif exam.is_active %}success{% else %}warning{% endif %}">
+            {% if exam.is_completed %}Completed{% elif exam.is_active %}Active{% else %}Upcoming{% endif %}
+        </span>
+    </div>
+    <div>
+        <a href="{% url 'academics:exam_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+        {% if user.is_admin_user %}
+        <a href="{% url 'academics:exam_schedule_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus"></i> Add Schedule
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Exam Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <p class="mb-1 text-muted small">Exam Name</p>
+                        <p class="mb-0 fw-medium">{{ exam.name }}</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="mb-1 text-muted small">Exam Type</p>
+                        <p class="mb-0 fw-medium">{{ exam.get_exam_type_display }}</p>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <p class="mb-1 text-muted small">Academic Year</p>
+                        <p class="mb-0 fw-medium">{{ exam.academic_year.name }}</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="mb-1 text-muted small">Total Schedules</p>
+                        <p class="mb-0 fw-medium">{{ schedules.count }}</p>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <p class="mb-1 text-muted small">Start Date</p>
+                        <p class="mb-0 fw-medium">{{ exam.start_date|date:"M d, Y" }}</p>
+                    </div>
+                    <div class="col-6">
+                        <p class="mb-1 text-muted small">End Date</p>
+                        <p class="mb-0 fw-medium">{{ exam.end_date|date:"M d, Y" }}</p>
+                    </div>
+                </div>
+                {% if exam.description %}
+                <div class="row">
+                    <div class="col-12">
+                        <p class="mb-1 text-muted small">Description</p>
+                        <p class="mb-0">{{ exam.description|linebreaks }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Status Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-4 text-center">
+                        <div class="p-3 bg-primary bg-opacity-10 rounded-3">
+                            <i class="bi bi-calendar-event text-primary fs-2"></i>
+                            <h4 class="mt-2 mb-0">{{ exam.exam_schedules.count }}</h4>
+                            <small class="text-muted">Schedules</small>
+                        </div>
+                    </div>
+                    <div class="col-4 text-center">
+                        <div class="p-3 bg-success bg-opacity-10 rounded-3">
+                            <i class="bi bi-check-circle text-success fs-2"></i>
+                            <h4 class="mt-2 mb-0">{{ result_count|default:"0" }}</h4>
+                            <small class="text-muted">Results Added</small>
+                        </div>
+                    </div>
+                    <div class="col-4 text-center">
+                        <div class="p-3 bg-warning bg-opacity-10 rounded-3">
+                            <i class="bi bi-people text-warning fs-2"></i>
+                            <h4 class="mt-2 mb-0">{{ unique_students|default:"0" }}</h4>
+                            <small class="text-muted">Students</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-calendar-week me-2"></i>Exam Schedule</h5>
+        {% if user.is_admin_user %}
+        <a href="{% url 'academics:exam_schedule_create' %}" class="btn btn-sm btn-success">
+            <i class="bi bi-plus"></i> Add Subject
+        </a>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Class</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Total Marks</th>
+                        <th>Passing Marks</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for schedule in schedules %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                    <i class="bi bi-book text-primary"></i>
+                                </div>
+                                <strong>{{ schedule.subject.name }}</strong>
+                            </div>
+                        </td>
+                        <td><span class="badge bg-secondary">{{ schedule.assigned_class.name }}</span></td>
+                        <td>{{ schedule.exam_date|date:"M d, Y" }}</td>
+                        <td>{{ schedule.start_time|time:"H:i" }} - {{ schedule.end_time|time:"H:i" }}</td>
+                        <td><span class="badge bg-primary">{{ schedule.total_marks }}</span></td>
+                        <td><span class="badge bg-info">{{ schedule.passing_marks }}</span></td>
+                        <td>
+                            <a href="{% url 'academics:result_create' %}" class="btn btn-sm btn-success">
+                                <i class="bi bi-plus"></i> Add Result
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4">
+                            <div class="text-muted">
+                                <i class="bi bi-calendar-x fs-1 d-block mb-2"></i>
+                                <p class="mb-0">No schedules added yet</p>
+                                {% if user.is_admin_user %}
+                                <a href="{% url 'academics:exam_schedule_create' %}" class="btn btn-primary mt-2">
+                                    <i class="bi bi-plus me-1"></i> Add First Schedule
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

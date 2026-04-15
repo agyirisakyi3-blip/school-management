@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}Homework - School Management{% endblock %}
+
+{% block page_title %}Homework Management{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <div>
+                    <h5 class="mb-0"><i class="bi bi-journal-text text-primary me-2"></i>Homework</h5>
+                    <p class="text-muted small mb-0">View and manage homework assignments</p>
+                </div>
+                {% if user.is_teacher or user.is_admin_user %}
+                <div>
+                    <a href="{% url 'homework:create' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-lg me-2"></i>Assign Homework
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 py-3">Title</th>
+                                <th class="border-0 py-3">Subject</th>
+                                <th class="border-0 py-3">Class</th>
+                                <th class="border-0 py-3">Due Date</th>
+                                <th class="border-0 py-3">Priority</th>
+                                <th class="border-0 py-3">Submissions</th>
+                                <th class="border-0 py-3">Status</th>
+                                <th class="border-0 py-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for homework in homeworks %}
+                            <tr>
+                                <td>
+                                    <strong>{{ homework.title }}</strong>
+                                    <br><small class="text-muted">{{ homework.teacher.get_full_name }}</small>
+                                </td>
+                                <td>{{ homework.subject.name }}</td>
+                                <td>{{ homework.class_obj.name }}</td>
+                                <td>
+                                    {{ homework.due_date|date:"M d, Y" }}<br>
+                                    <small class="{% if homework.due_date < now %}text-danger{% else %}text-muted{% endif %}">
+                                        {{ homework.due_date|time:"H:i" }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-{% if homework.priority == 'high' %}danger{% elif homework.priority == 'medium' %}warning{% else %}secondary{% endif %}">
+                                        {{ homework.get_priority_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ homework.get_submission_count }}</span>
+                                    / {{ homework.class_obj.student_set.count }}
+                                </td>
+                                <td>
+                                    {% if homework.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        {% if user.is_teacher or user.is_admin_user %}
+                                        <a href="{% url 'homework:submissions' homework.pk %}" class="btn btn-sm btn-light">
+                                            <i class="bi bi-eye text-info"></i>
+                                        </a>
+                                        <a href="{% url 'homework:update' homework.pk %}" class="btn btn-sm btn-light">
+                                            <i class="bi bi-pencil text-warning"></i>
+                                        </a>
+                                        <a href="{% url 'homework:delete' homework.pk %}" class="btn btn-sm btn-light">
+                                            <i class="bi bi-trash text-danger"></i>
+                                        </a>
+                                        {% elif user.is_student %}
+                                        <a href="{% url 'homework:submit' homework.pk %}" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-upload me-1"></i>Submit
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <i class="bi bi-journal-text fs-1 d-block mb-3 text-muted"></i>
+                                    <h5>No Homework Found</h5>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

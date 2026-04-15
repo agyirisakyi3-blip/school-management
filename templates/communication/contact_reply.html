@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Reply to Contact - School Management System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-10 offset-md-1">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Original Enquiry</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>From:</strong> {{ contact.name }} ({{ contact.email }})</p>
+                <p><strong>Subject:</strong> {{ contact.subject }}</p>
+                <hr>
+                <p>{{ contact.message }}</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h4>Send Reply</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary">Send Reply</button>
+                        <a href="{% url 'communication:contact_list' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

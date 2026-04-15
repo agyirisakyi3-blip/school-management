@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Library Members - School Management System{% endblock %}
+
+{% block page_title %}Library Members{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <div>
+                    <h5 class="mb-0"><i class="bi bi-people text-primary me-2"></i>Library Members</h5>
+                    <p class="text-muted small mb-0">Manage library membership</p>
+                </div>
+                {% if user.is_admin_user %}
+                <a href="{% url 'library:member_create' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-2"></i>Add Member
+                </a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 py-3">Member ID</th>
+                                <th class="border-0 py-3">Name</th>
+                                <th class="border-0 py-3">Type</th>
+                                <th class="border-0 py-3">Join Date</th>
+                                <th class="border-0 py-3">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in members %}
+                            <tr>
+                                <td><code>{{ member.member_id }}</code></td>
+                                <td>{{ member.user.get_full_name }}</td>
+                                <td><span class="badge bg-info">{{ member.get_member_type_display }}</span></td>
+                                <td>{{ member.join_date|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if member.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="bi bi-people fs-1 d-block mb-3"></i>
+                                        <h5>No Members Found</h5>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

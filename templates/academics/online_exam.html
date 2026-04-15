@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ exam_schedule.subject.name }} - Online Exam{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0">{{ exam_schedule.exam.name }}</h5>
+                        <small>{{ exam_schedule.subject.name }} - {{ exam_schedule.assigned_class.name }}</small>
+                    </div>
+                    <div class="text-end">
+                        <div class="badge bg-light text-dark fs-6">
+                            <i class="bi bi-clock me-1"></i>
+                            <span id="timer">{{ time_remaining }}</span> min remaining
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="post" id="examForm">
+                    {% csrf_token %}
+                    
+                    {% for question in questions %}
+                    <div class="question-card mb-4 p-3 border rounded">
+                        <div class="d-flex justify-content-between mb-3">
+                            <h6 class="mb-0">Question {{ forloop.counter }}</h6>
+                            <span class="badge bg-secondary">{{ question.marks }} marks</span>
+                        </div>
+                        
+                        <p class="mb-3">{{ question.question_text }}</p>
+                        
+                        {% if question.question_type == 'multiple_choice' %}
+                        <div class="options">
+                            {% for key, value in question.options.items %}
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" 
+                                       name="question_{{ question.id }}" 
+                                       id="q{{ question.id }}_{{ key }}"
+                                       value="{{ key }}"
+                                       {% if answers|get_item:question.id == key %}checked{% endif %}>
+                                <label class="form-check-label" for="q{{ question.id }}_{{ key }}">
+                                    {{ value }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        {% elif question.question_type == 'true_false' %}
+                        <div class="options">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" 
+                                       name="question_{{ question.id }}" 
+                                       id="q{{ question.id }}_true"
+                                       value="true"
+                                       {% if answers|get_item:question.id == 'true' %}checked{% endif %}>
+                                <label class="form-check-label" for="q{{ question.id }}_true">True</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" 
+                                       name="question_{{ question.id }}" 
+                                       id="q{{ question.id }}_false"
+                                       value="false"
+                                       {% if answers|get_item:question.id == 'false' %}checked{% endif %}>
+                                <label class="form-check-label" for="q{{ question.id }}_false">False</label>
+                            </div>
+                        </div>
+                        
+                        {% else %}
+                        <textarea class="form-control" name="question_{{ question.id }}" 
+                                  rows="3" placeholder="Your answer...">{{ answers|get_item:question.id }}</textarea>
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-exclamation-circle text-warning fs-1 d-block mb-3"></i>
+                        <h5>No Questions Available</h5>
+                        <p class="text-muted">This exam has no questions yet. Contact your teacher.</p>
+                    </div>
+                    {% endfor %}
+                    
+                    {% if questions %}
+                    <div class="d-flex justify-content-between pt-3 border-top">
+                        <a href="{% url 'academics:online_exam_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Back
+                        </a>
+                        <button type="button" class="btn btn-success" onclick="submitExam()">
+                            <i class="bi bi-check-lg me-2"></i>Submit Exam
+                        </button>
+                    </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let timeRemaining = {{ time_remaining }};
+
+function updateTimer() {
+    const timerEl = document.getElementById('timer');
+    if (timeRemaining <= 0) {
+        document.getElementById('examForm').submit();
+        return;
+    }
+    timerEl.textContent = timeRemaining;
+    timeRemaining--;
+}
+
+const timerInterval = setInterval(updateTimer, 60000);
+updateTimer();
+
+function submitExam() {
+    if (confirm('Are you sure you want to submit your exam? You cannot change your answers after submission.')) {
+        clearInterval(timerInterval);
+        document.getElementById('examForm').submit();
+    }
+}
+
+window.onbeforeunload = function() {
+    return "Are you sure you want to leave? Your exam progress will be lost.";
+};
+</script>
+{% endblock %}

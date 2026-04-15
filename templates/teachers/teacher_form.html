@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title|default:"Add Teacher" }} - School Management System{% endblock %}
+
+{% block page_title %}{% if form.instance.pk %}Edit Teacher{% else %}Add New Teacher{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <div>
+                    <h5 class="mb-0"><i class="bi bi-mortarboard text-primary me-2"></i>{% if form.instance.pk %}Edit Teacher{% else %}Add New Teacher{% endif %}</h5>
+                    <p class="text-muted small mb-0">{% if form.instance.pk %}Update teacher information{% else %}Fill in the teacher details{% endif %}</p>
+                </div>
+                <a href="{% url 'teachers:teacher_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Back
+                </a>
+            </div>
+            <div class="card-body">
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="form-section">
+                                <h6 class="text-muted mb-3"><i class="bi bi-person me-2"></i>Basic Information</h6>
+                                {{ form|crispy }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-section">
+                                <h6 class="text-muted mb-3"><i class="bi bi-info-circle me-2"></i>Additional Information</h6>
+                                <div class="mb-3">
+                                    <label class="form-label">Employee ID <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="employee_id" value="{{ form.instance.employee_id|default:'' }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Join Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" name="join_date" value="{{ form.instance.join_date|default:'' }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Qualification <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" name="qualification" value="{{ form.instance.qualification|default:'' }}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Experience (Years)</label>
+                                    <input type="number" class="form-control" name="experience_years" value="{{ form.instance.experience_years|default:'0' }}" min="0">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Specialization</label>
+                                    <input type="text" class="form-control" name="specialization" value="{{ form.instance.specialization|default:'' }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Department</label>
+                                    <input type="text" class="form-control" name="department" value="{{ form.instance.department|default:'' }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Salary</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control" name="salary" value="{{ form.instance.salary|default:'' }}" step="0.01">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Status</label>
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" class="form-check-input" id="is_active" name="is_active" {% if form.instance.is_active %}checked{% endif %}>
+                                        <label class="form-check-label" for="is_active">Active</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'teachers:teacher_list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-lg me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-2"></i>Save Teacher
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 10px;
+    }
+    .form-section h6 {
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 10px;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}Payments - School Management System{% endblock %}
+
+{% block page_title %}Payment Records{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-credit-card me-2"></i>Payment Records</h2>
+    <a href="{% url 'finance:payment_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Record Payment
+    </a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="bg-success bg-opacity-10 rounded-3 p-3">
+            <div class="d-flex align-items-center">
+                <div class="bg-success rounded-circle p-3 me-3">
+                    <i class="bi bi-check-circle text-white"></i>
+                </div>
+                <div>
+                    <h3 class="mb-0">${{ total_amount|default:"0"|floatformat:0 }}</h3>
+                    <small class="text-muted">Total Collected</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="bg-primary bg-opacity-10 rounded-3 p-3">
+            <div class="d-flex align-items-center">
+                <div class="bg-primary rounded-circle p-3 me-3">
+                    <i class="bi bi-people text-white"></i>
+                </div>
+                <div>
+                    <h3 class="mb-0">{{ payments|length }}</h3>
+                    <small class="text-muted">Total Transactions</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="bg-info bg-opacity-10 rounded-3 p-3">
+            <div class="d-flex align-items-center">
+                <div class="bg-info rounded-circle p-3 me-3">
+                    <i class="bi bi-calendar-check text-white"></i>
+                </div>
+                <div>
+                    <h3 class="mb-0">{{ today_amount|default:"0"|floatformat:0 }}</h3>
+                    <small class="text-muted">Today's Collection</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-white">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" name="student" class="form-control" placeholder="Search by Student ID..." value="{{ request.GET.student }}">
+            </div>
+            <div class="col-md-3">
+                <select name="method" class="form-select">
+                    <option value="">All Methods</option>
+                    <option value="cash" {% if request.GET.method == 'cash' %}selected{% endif %}>Cash</option>
+                    <option value="card" {% if request.GET.method == 'card' %}selected{% endif %}>Card</option>
+                    <option value="bank_transfer" {% if request.GET.method == 'bank_transfer' %}selected{% endif %}>Bank Transfer</option>
+                    <option value="online" {% if request.GET.method == 'online' %}selected{% endif %}>Online</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-secondary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Receipt No</th>
+                        <th>Student</th>
+                        <th>Fee Type</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Method</th>
+                        <th>Received By</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                    <tr>
+                        <td><code class="bg-light px-2 py-1">#{{ payment.pk|stringformat:"05d" }}</code></td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle bg-success text-white me-3">
+                                    {{ payment.student_fee.student.user.first_name|make_list|first|upper }}
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">{{ payment.student_fee.student.user.get_full_name }}</h6>
+                                    <small class="text-muted">{{ payment.student_fee.student.student_id }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ payment.student_fee.fee_structure.category.name }}</td>
+                        <td><strong class="text-success">${{ payment.amount|floatformat:2 }}</strong></td>
+                        <td>{{ payment.payment_date|date:"M d, Y" }}</td>
+                        <td>
+                            <span class="badge bg-{% if payment.payment_method == 'cash' %}success{% elif payment.payment_method == 'card' %}primary{% elif payment.payment_method == 'bank_transfer' %}info{% else %}warning{% endif %}">
+                                {{ payment.get_payment_method_display }}
+                            </span>
+                        </td>
+                        <td>{{ payment.received_by.get_full_name }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-light" title="Print Receipt">
+                                <i class="bi bi-printer text-primary"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="bi bi-credit-card fs-1 d-block mb-3"></i>
+                                <h5>No Payments Found</h5>
+                                <p>Record the first payment to get started.</p>
+                                <a href="{% url 'finance:payment_create' %}" class="btn btn-primary">
+                                    <i class="bi bi-plus-circle me-2"></i>Record Payment
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}

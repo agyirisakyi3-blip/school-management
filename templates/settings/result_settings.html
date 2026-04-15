@@ -1,0 +1,114 @@
+{% extends 'settings/dashboard.html' %}
+{% load crispy_forms_tags %}
+
+{% block settings_content %}
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-0"><i class="bi bi-file-earmark-text" style="color: #800080;"></i> Result Settings</h5>
+                <p class="text-muted small mb-0">Configure grading and result publishing options</p>
+            </div>
+            <a href="{% url 'settings:dashboard' %}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left me-1"></i>Back
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h6 class="text-muted mb-3"><i class="bi bi-bar-chart me-2"></i>Grading System</h6>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small text-muted fw-bold">Grading System</label>
+                    {{ form.grading_system }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small text-muted fw-bold">Decimal Points</label>
+                    {{ form.decimal_points }}
+                    <div class="form-text">Decimal places for percentage display</div>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h6 class="text-muted mb-3"><i class="bi bi-share me-2"></i>Publishing Options</h6>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small text-muted fw-bold">Result Publishing</label>
+                    {{ form.publish_result }}
+                    <div class="form-text">Auto: Results published automatically | Manual: Requires approval</div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check form-switch mb-3 mt-4">
+                        {{ form.require_attendance_for_result }}
+                        <label class="form-check-label" for="{{ form.require_attendance_for_result.id_for_label }}">
+                            <strong>Require Minimum Attendance</strong>
+                            <small class="text-muted d-block">Students must meet attendance requirement</small>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <h6 class="text-muted mb-3"><i class="bi bi-eye me-2"></i>Display Options</h6>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check form-switch mb-3">
+                        {{ form.allow_rank }}
+                        <label class="form-check-label" for="{{ form.allow_rank.id_for_label }}">
+                            <strong>Show Student Ranking</strong>
+                            <small class="text-muted d-block">Display class rank/position</small>
+                        </label>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        {{ form.show_pass_fail }}
+                        <label class="form-check-label" for="{{ form.show_pass_fail.id_for_label }}">
+                            <strong>Show Pass/Fail Status</strong>
+                            <small class="text-muted d-block">Display pass or fail on report card</small>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-check form-switch mb-3">
+                        {{ form.show_grade }}
+                        <label class="form-check-label" for="{{ form.show_grade.id_for_label }}">
+                            <strong>Show Grade</strong>
+                            <small class="text-muted d-block">Display letter grade (A, B, C, etc.)</small>
+                        </label>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        {{ form.show_percentage }}
+                        <label class="form-check-label" for="{{ form.show_percentage.id_for_label }}">
+                            <strong>Show Percentage</strong>
+                            <small class="text-muted d-block">Display marks as percentage</small>
+                        </label>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        {{ form.show_remarks }}
+                        <label class="form-check-label" for="{{ form.show_remarks.id_for_label }}">
+                            <strong>Show Teacher Remarks</strong>
+                            <small class="text-muted d-block">Include teacher's comments</small>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                <a href="{% url 'settings:dashboard' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                <button type="submit" class="btn px-4" style="background-color: #800080; color: white;">
+                    <i class="bi bi-check-lg me-2"></i>Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

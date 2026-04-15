@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+
+{% block title %}Classes - School Management System{% endblock %}
+
+{% block page_title %}Class Management{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <div>
+                    <h5 class="mb-0"><i class="bi bi-collection text-primary me-2"></i>All Classes</h5>
+                    <p class="text-muted small mb-0">Manage classes, assign teachers and subjects</p>
+                </div>
+                {% if user.is_admin_user %}
+                <a href="{% url 'students:class_create' %}" class="btn btn-primary">
+                    <i class="bi bi-plus-lg me-2"></i>Add New Class
+                </a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <form method="get" id="filterForm">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label small text-muted">Search</label>
+                            <div class="input-group">
+                                <input type="text" name="search" class="form-control" placeholder="Search by name or code..." value="{{ search }}">
+                                <button class="btn btn-outline-secondary" type="submit">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Academic Year</label>
+                            <select name="academic_year" class="form-select">
+                                <option value="">All Years</option>
+                                {% for year in academic_years %}
+                                <option value="{{ year.pk }}" {% if academic_year_filter == year.pk|stringformat:"s" %}selected{% endif %}>
+                                    {{ year.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small text-muted">Sort By</label>
+                            <select name="sort" class="form-select">
+                                <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>Date Created</option>
+                                <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Name A-Z</option>
+                                <option value="name_desc" {% if sort_by == 'name_desc' %}selected{% endif %}>Name Z-A</option>
+                                <option value="students_count" {% if sort_by == 'students_count' %}selected{% endif %}>Students Count</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-funnel me-2"></i>Apply
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="bg-light rounded-3 p-3">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-primary bg-opacity-10 rounded-circle p-3 me-3">
+                                    <i class="bi bi-collection text-primary fs-4"></i>
+                                </div>
+                                <div>
+                                    <h3 class="mb-0">{{ total_classes }}</h3>
+                                    <small class="text-muted">Total Classes</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-light rounded-3 p-3">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-success bg-opacity-10 rounded-circle p-3 me-3">
+                                    <i class="bi bi-people text-success fs-4"></i>
+                                </div>
+                                <div>
+                                    <h3 class="mb-0">{{ total_students_in_classes }}</h3>
+                                    <small class="text-muted">Total Students</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-light rounded-3 p-3">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-warning bg-opacity-10 rounded-circle p-3 me-3">
+                                    <i class="bi bi-person-check text-warning fs-4"></i>
+                                </div>
+                                <div>
+                                    <h3 class="mb-0">{{ classes_with_teachers }}</h3>
+                                    <small class="text-muted">With Teachers</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="bg-light rounded-3 p-3">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-info bg-opacity-10 rounded-circle p-3 me-3">
+                                    <i class="bi bi-journal-bookmark text-info fs-4"></i>
+                                </div>
+                                <div>
+                                    <h3 class="mb-0">{{ total_subjects }}</h3>
+                                    <small class="text-muted">Total Subjects</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 py-3">Class</th>
+                                <th class="border-0 py-3">Code</th>
+                                <th class="border-0 py-3">Academic Year</th>
+                                <th class="border-0 py-3">Class Teacher</th>
+                                <th class="border-0 py-3">Students</th>
+                                <th class="border-0 py-3">Subjects</th>
+                                <th class="border-0 py-3">Description</th>
+                                <th class="border-0 py-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for class in classes %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle bg-primary text-white me-3">
+                                            {{ class.name|make_list|first|upper }}
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">{{ class.name }}</h6>
+                                            <small class="text-muted">Class</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <code class="bg-light px-2 py-1 rounded">{{ class.code }}</code>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ class.academic_year.name }}</span>
+                                </td>
+                                <td>
+                                    {% if class.class_teacher %}
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle-sm bg-success text-white me-2">
+                                            {{ class.class_teacher.first_name|make_list|first|upper }}
+                                        </div>
+                                        <span>{{ class.class_teacher.get_full_name }}</span>
+                                    </div>
+                                    {% else %}
+                                    <span class="text-muted">Not Assigned</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">{{ class.students.count }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary">{{ class.subjects.count }}</span>
+                                </td>
+                                <td>
+                                    <span class="text-muted small">{{ class.description|truncatechars:40|default:"-" }}</span>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{% url 'students:class_detail' class.pk %}" class="btn btn-sm btn-light" title="View">
+                                            <i class="bi bi-eye text-primary"></i>
+                                        </a>
+                                        {% if user.is_admin_user %}
+                                        <a href="{% url 'students:class_update' class.pk %}" class="btn btn-sm btn-light" title="Edit">
+                                            <i class="bi bi-pencil text-warning"></i>
+                                        </a>
+                                        <a href="{% url 'students:class_delete' class.pk %}" class="btn btn-sm btn-light" title="Delete">
+                                            <i class="bi bi-trash text-danger"></i>
+                                        </a>
+                                        {% endif %}
+                                        <button class="btn btn-sm btn-light dropdown-toggle" data-bs-toggle="dropdown">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a class="dropdown-item" href="{% url 'students:class_detail' class.pk %}">
+                                                <i class="bi bi-eye me-2"></i>View Details
+                                            </a></li>
+                                            <li><a class="dropdown-item" href="{% url 'students:student_list' %}?class={{ class.pk }}">
+                                                <i class="bi bi-people me-2"></i>View Students
+                                            </a></li>
+                                            {% if user.is_admin_user %}
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item" href="{% url 'students:class_update' class.pk %}">
+                                                <i class="bi bi-pencil me-2"></i>Edit Class
+                                            </a></li>
+                                            <li><a class="dropdown-item text-danger" href="{% url 'students:class_delete' class.pk %}">
+                                                <i class="bi bi-trash me-2"></i>Delete Class
+                                            </a></li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="bi bi-collection fs-1 d-block mb-3"></i>
+                                        <h5>No Classes Found</h5>
+                                        <p>Start by creating your first class.</p>
+                                        {% if user.is_admin_user %}
+                                        <a href="{% url 'students:class_create' %}" class="btn btn-primary">
+                                            <i class="bi bi-plus-lg me-2"></i>Add Class
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if page_obj.has_other_pages %}
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <div class="text-muted">
+                        Showing <strong>{{ page_obj.start_index }}</strong> to <strong>{{ page_obj.end_index }}</strong> of <strong>{{ paginator.count }}</strong> entries
+                    </div>
+                    <nav>
+                        <ul class="pagination mb-0">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}{% if academic_year_filter %}&academic_year={{ academic_year_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">First</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if academic_year_filter %}&academic_year={{ academic_year_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Previous</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">Previous</a>
+                            </li>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <a class="page-link" href="#">{{ num }}</a>
+                            </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if academic_year_filter %}&academic_year={{ academic_year_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">{{ num }}</a>
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+                            
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if academic_year_filter %}&academic_year={{ academic_year_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Next</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if academic_year_filter %}&academic_year={{ academic_year_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Last</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">Next</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-circle {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+    }
+    .avatar-circle-sm {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 12px;
+    }
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+</style>
+{% endblock %}

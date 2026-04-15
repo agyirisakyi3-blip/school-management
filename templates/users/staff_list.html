@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Non-Teaching Staff - School Management System{% endblock %}
+
+{% block page_title %}Non-Teaching Staff{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0"><i class="bi bi-people text-primary me-2"></i>All Staff Members</h5>
+                        <p class="text-muted small mb-0">Manage non-teaching staff records</p>
+                    </div>
+                    <a href="{% url 'users:staff_create' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-lg me-2"></i>Add Staff
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="get" class="mb-4">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <input type="text" name="search" class="form-control" placeholder="Search by name, ID, email..." value="{{ request.GET.search }}">
+                        </div>
+                        <div class="col-md-3">
+                            <select name="department" class="form-select">
+                                <option value="">All Departments</option>
+                                {% for dept in departments %}
+                                <option value="{{ dept }}">{{ dept }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-outline-primary w-100">
+                                <i class="bi bi-search me-2"></i>Search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="border-0 py-3">Staff ID</th>
+                                <th class="border-0 py-3">Name</th>
+                                <th class="border-0 py-3">Role</th>
+                                <th class="border-0 py-3">Department</th>
+                                <th class="border-0 py-3">Designation</th>
+                                <th class="border-0 py-3">Status</th>
+                                <th class="border-0 py-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for staff in staff_list %}
+                            <tr>
+                                <td><span class="badge bg-light text-dark">{{ staff.staff_id }}</span></td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        {% if staff.user.profile_picture %}
+                                        <img src="{{ staff.user.profile_picture.url }}" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
+                                        {% else %}
+                                        <div class="bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center text-white" style="width: 40px; height: 40px;">
+                                            {{ staff.user.first_name|make_list|first|upper }}
+                                        </div>
+                                        {% endif %}
+                                        <div>
+                                            <h6 class="mb-0">{{ staff.user.get_full_name }}</h6>
+                                            <small class="text-muted">{{ staff.user.email }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-info">{{ staff.user.get_staff_type_display_name }}</span></td>
+                                <td>{{ staff.department|default:"-" }}</td>
+                                <td>{{ staff.designation|default:"-" }}</td>
+                                <td>
+                                    {% if staff.is_active %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'users:staff_detail' staff.pk %}" class="btn btn-sm btn-light" title="View">
+                                        <i class="bi bi-eye text-primary"></i>
+                                    </a>
+                                    <a href="{% url 'users:staff_update' staff.pk %}" class="btn btn-sm btn-light" title="Edit">
+                                        <i class="bi bi-pencil text-warning"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="bi bi-people fs-1 d-block mb-3"></i>
+                                        <h5>No Staff Found</h5>
+                                        <a href="{% url 'users:staff_create' %}" class="btn btn-primary">
+                                            <i class="bi bi-plus-lg me-2"></i>Add Staff
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if page_obj.has_other_pages %}
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <div class="text-muted small">
+                        Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ paginator.count }} entries
+                    </div>
+                    <nav>
+                        <ul class="pagination mb-0">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page=1">First</a></li>
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+                            {% endif %}
+                            {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                            <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                            {% endif %}
+                            {% endfor %}
+                            {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last</a></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

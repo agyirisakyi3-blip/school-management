@@ -20,7 +20,7 @@ _allowed_hosts_env = os.getenv("ALLOWED_HOSTS", "")
 if _allowed_hosts_env:
     ALLOWED_HOSTS = [h.strip() for h in _allowed_hosts_env.split(",") if h.strip()]
 else:
-    ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".loca.lt"]
+    ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".loca.lt", ".vercel.app"]
 
 if not DEBUG:
     ALLOWED_HOSTS.append(".onrender.com")

@@ -7,3 +7,4 @@ django-filter>=23.5
 Pillow>=10.0.0
 reportlab>=4.0.0
 gunicorn>=21.0.0
+vercel>=0.13.0

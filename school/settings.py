@@ -92,6 +92,12 @@ DATABASES = {
     }
 }
 
+db_from_render = os.getenv("DATABASE_URL")
+if db_from_render and db_from_render.startswith("postgres://"):
+    import dj_database_url
+
+    DATABASES["default"] = dj_database_url.parse(db_from_render)
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"

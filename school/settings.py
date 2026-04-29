@@ -92,16 +92,26 @@ WSGI_APPLICATION = "school.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": os.getenv("DB_ENGINE", "django.db.backends.sqlite3"),
+        "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
-db_from_render = os.getenv("DATABASE_URL")
-if db_from_render and db_from_render.startswith("postgres://"):
-    import dj_database_url
+# Vercel has a read-only filesystem; use /tmp for SQLite or connect to Postgres
+if os.getenv("VERCEL"):
+    import tempfile
+    DATABASES["default"] = {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(tempfile.gettempdir(), "db.sqlite3"),
+    }
 
-    DATABASES["default"] = dj_database_url.parse(db_from_render)
+# PostgreSQL support (Render, Vercel Postgres, etc.)
+db_url = os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL") or os.getenv("POSTGRES_PRISMA_URL")
+if db_url:
+    import dj_database_url
+    if db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql://", 1)
+    DATABASES["default"] = dj_database_url.parse(db_url)
 
 AUTH_PASSWORD_VALIDATORS = [
     {

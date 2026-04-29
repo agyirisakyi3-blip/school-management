@@ -61,7 +61,7 @@ class LeaveRequest(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"{self.user.get_full_name} - {self.leave_type.name} ({self.start_date} to {self.end_date})"
+        return f"{self.user.get_full_name()} - {self.leave_type.name} ({self.start_date} to {self.end_date})"
 
     def get_total_days(self):
         return (self.end_date - self.start_date).days + 1

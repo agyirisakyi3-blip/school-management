@@ -846,3 +846,62 @@ class NonTeachingStaffUpdateView(AdminRequiredMixin, TemplateView):
             messages.success(request, "Staff member updated successfully!")
             return redirect("users:staff_detail", pk=pk)
         return render(request, self.template_name, {"form": form, "staff": staff})
+
+
+def api_search(request):
+    from django.http import JsonResponse
+    from ..students.models import Student
+    from ..teachers.models import Teacher
+    from ..finance.models import StudentFee
+    from .models import User
+    
+    query = request.GET.get('q', '')
+    results = []
+    
+    # Search students
+    for s in Student.objects.filter(user__first_name__icontains=query)[:5]:
+        results.append({
+            'name': s.user.get_full_name(),
+            'type': 'Student',
+            'url': f'/students/{s.pk}/',
+            'icon': 'person'
+        })
+    
+    # Search teachers
+    for t in Teacher.objects.filter(user__first_name__icontains=query)[:5]:
+        results.append({
+            'name': t.user.get_full_name(),
+            'type': 'Teacher',
+            'url': f'/teachers/{t.pk}/',
+            'icon': 'person-badge'
+        })
+    
+    # Search users
+    for u in User.objects.filter(first_name__icontains=query)[:5]:
+        results.append({
+            'name': u.get_full_name(),
+            'type': u.get_role_display(),
+            'url': f'/users/{u.pk}/',
+            'icon': 'person-circle'
+        })
+    
+    return JsonResponse(results, safe=False)
+
+
+def api_notifications(request):
+    from django.http import JsonResponse
+    from ..communication.models import Notification
+    
+    notifications = Notification.objects.filter(
+        recipient=request.user,
+        is_read=False
+    )[:5]
+    
+    data = {
+        'count': notifications.count(),
+        'notifications': [
+            {'title': n.title, 'message': n.message}
+            for n in notifications
+        ]
+    }
+    return JsonResponse(data)

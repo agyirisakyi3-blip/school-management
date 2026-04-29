@@ -512,6 +512,46 @@ body {
     font-size: 5rem;
 }
 
+/* Interactive Features */
+.toast-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    z-index: 9999;
+    animation: slideIn 0.3s ease;
+}
+.toast-notification.toast-success { background: #198754; }
+.toast-notification.toast-error { background: #dc3545; }
+.toast-notification.toast-info { background: #0dcaf0; }
+
+@keyframes slideIn {
+    from { transform: translateX(100px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.search-result-item:hover {
+    background: var(--bg-color) !important;
+    color: inherit !important;
+}
+
+.loading-spinner {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #1565c0;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 /* Table Enhancements */
 .table-hover tbody tr {
     transition: background-color 0.2s, transform 0.2s;

@@ -144,3 +144,76 @@ class Student(models.Model):
         if not results.exists():
             return 0
         return round(results.aggregate(avg=models.Avg("marks_obtained"))["avg"], 1)
+
+
+class AdmissionApplication(models.Model):
+    """Online admission application model."""
+
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("reviewed", "Reviewed"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
+    ]
+
+    # Personal Information
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+    date_of_birth = models.DateField()
+    gender = models.CharField(max_length=10, choices=[
+        ("male", "Male"),
+        ("female", "Female"),
+        ("other", "Other"),
+    ])
+    email = models.EmailField()
+    phone = models.CharField(max_length=20)
+
+    # Guardian Information
+    guardian_name = models.CharField(max_length=200)
+    guardian_phone = models.CharField(max_length=20)
+    guardian_email = models.EmailField(blank=True)
+    guardian_relation = models.CharField(max_length=50)
+    guardian_occupation = models.CharField(max_length=100, blank=True)
+
+    # Academic Information
+    current_school = models.CharField(max_length=200, blank=True)
+    current_class = models.CharField(max_length=50, blank=True)
+    grade_level = models.CharField(max_length=50)
+    transfer_certificate = models.FileField(upload_to="admission/tc/", blank=True, null=True)
+
+    # Address
+    address = models.TextField()
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    postal_code = models.CharField(max_length=20, blank=True)
+
+    # Application Details
+    applied_for_class = models.ForeignKey(
+        Class, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    academic_year = models.ForeignKey(
+        AcademicYear, on_delete=models.SET_NULL, null=True
+    )
+
+    # Status
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    notes = models.TextField(blank=True)
+    assigned_student = models.OneToOneField(
+        Student, on_delete=models.SET_NULL, null=True, blank=True, related_name="admission_application"
+    )
+
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = "Admission Application"
+        verbose_name_plural = "Admission Applications"
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} - {self.grade_level}"
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"

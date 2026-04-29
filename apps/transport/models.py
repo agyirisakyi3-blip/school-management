@@ -56,7 +56,7 @@ class VehicleRoute(models.Model):
         null=True,
         blank=True,
         related_name="vehicle_routes",
-        limit_choices_to={"role": "teacher"},
+        limit_choices_to={"role": "driver"},
     )
     pickup_time = models.TimeField(null=True, blank=True)
     drop_time = models.TimeField(null=True, blank=True)

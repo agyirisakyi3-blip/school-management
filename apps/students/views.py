@@ -6,13 +6,15 @@ from django.views.generic import (
     UpdateView,
     DeleteView,
     View,
+    TemplateView,
+    FormView,
 )
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.shortcuts import redirect, get_object_or_404
 from django.http import HttpResponse
 from django.db.models import Q
-from .models import Student, Class, Subject, AcademicYear
+from .models import Student, Class, Subject, AcademicYear, AdmissionApplication
 from .forms import (
     StudentCreationForm,
     StudentForm,
@@ -394,3 +396,106 @@ class AcademicYearCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView)
             AcademicYear.objects.filter(is_current=True).update(is_current=False)
         messages.success(self.request, "Academic year created successfully.")
         return super().form_valid(form)
+
+
+# Online Admission Views
+class AdmissionFormView(TemplateView):
+    """Public admission form - no login required"""
+    template_name = "students/admission_form.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["classes"] = Class.objects.all()
+        context["academic_years"] = AcademicYear.objects.filter(is_current=True)
+        return context
+
+
+class AdmissionSubmitView(View):
+    """Handle admission form submission"""
+    def post(self, request):
+        application = AdmissionApplication.objects.create(
+            first_name=request.POST.get("first_name"),
+            last_name=request.POST.get("last_name"),
+            date_of_birth=request.POST.get("date_of_birth"),
+            gender=request.POST.get("gender"),
+            email=request.POST.get("email"),
+            phone=request.POST.get("phone"),
+            guardian_name=request.POST.get("guardian_name"),
+            guardian_phone=request.POST.get("guardian_phone"),
+            guardian_email=request.POST.get("guardian_email", ""),
+            guardian_relation=request.POST.get("guardian_relation"),
+            guardian_occupation=request.POST.get("guardian_occupation", ""),
+            current_school=request.POST.get("current_school", ""),
+            current_class=request.POST.get("current_class", ""),
+            grade_level=request.POST.get("grade_level"),
+            address=request.POST.get("address"),
+            city=request.POST.get("city"),
+            state=request.POST.get("state"),
+            postal_code=request.POST.get("postal_code", ""),
+            academic_year_id=request.POST.get("academic_year"),
+            applied_for_class_id=request.POST.get("applied_for_class") or None,
+        )
+        messages.success(
+            request,
+            f"Thank you {application.full_name}! Your application has been submitted. "
+            f"We will contact you at {application.phone} soon."
+        )
+        return redirect("students:admission_form")
+
+
+class AdmissionListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
+    """Admin list of admission applications"""
+    model = AdmissionApplication
+    template_name = "students/admission_list.html"
+    context_object_name = "applications"
+    paginate_by = 20
+
+    def get_queryset(self):
+        qs = AdmissionApplication.objects.all()
+        status = self.request.GET.get("status")
+        if status:
+            qs = qs.filter(status=status)
+        return qs
+
+
+class AdmissionDetailView(LoginRequiredMixin, AdminRequiredMixin, DetailView):
+    """View admission application details"""
+    model = AdmissionApplication
+    template_name = "students/admission_detail.html"
+    context_object_name = "application"
+
+
+from datetime import date
+
+class AdmissionApproveView(LoginRequiredMixin, AdminRequiredMixin, View):
+    """Approve admission and create student"""
+    def post(self, request, pk):
+        app = get_object_or_404(AdmissionApplication, pk=pk)
+        # Create user account
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        user = User.objects.create_user(
+            username=f"{app.first_name.lower()}{app.last_name.lower()}{app.pk}",
+            email=app.email,
+            password="Welcome@123",
+            first_name=app.first_name,
+            last_name=app.last_name,
+            role=User.Role.STUDENT,
+        )
+        # Create student record
+        student = Student.objects.create(
+            user=user,
+            student_id=f"ST{str(AdmissionApplication.objects.count()+1).zfill(5)}",
+            admission_date=date.today(),
+            current_class=app.applied_for_class,
+            guardian_name=app.guardian_name,
+            guardian_phone=app.guardian_phone,
+            guardian_relation=app.guardian_relation,
+        )
+        # Update application
+        app.status = "approved"
+        app.assigned_student = student
+        app.notes = f"Approved. Student ID: {student.student_id}"
+        app.save()
+        messages.success(request, f"Student created! ID: {student.student_id}")
+        return redirect("students:admission_list")

@@ -1,0 +1,33 @@
+{
+  "name": "SchoolMS - School Management System",
+  "short_name": "SchoolMS",
+  "description": "Comprehensive school management system for managing students, teachers, attendance, exams, fees, and more.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1565c0",
+  "theme_color": "#1565c0",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/static/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "business"],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "url": "/"
+    },
+    {
+      "name": "Students",
+      "url": "/students/"
+    },
+    {
+      "name": "Attendance",
+      "url": "/attendance/"
+    }
+  ]
+}

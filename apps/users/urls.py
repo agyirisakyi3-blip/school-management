@@ -5,6 +5,8 @@ from . import views
 app_name = "users"
 
 urlpatterns = [
+    path("api/search/", views.api_search, name="api_search"),
+    path("api/notifications/", views.api_notifications, name="api_notifications"),
     path(
         "login/",
         auth_views.LoginView.as_view(

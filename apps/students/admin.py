@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Student, Class, Subject, AcademicYear
+from .models import Student, Class, Subject, AcademicYear, AdmissionApplication
 
 
 @admin.register(AcademicYear)
@@ -36,3 +36,20 @@ class StudentAdmin(admin.ModelAdmin):
     ]
     autocomplete_fields = ["user", "current_class"]
     readonly_fields = ["created_at", "updated_at"]
+
+
+@admin.register(AdmissionApplication)
+class AdmissionApplicationAdmin(admin.ModelAdmin):
+    list_display = ["full_name", "grade_level", "applied_for_class", "status", "created_at"]
+    list_filter = ["status", "grade_level"]
+    search_fields = ["first_name", "last_name", "email", "phone"]
+    readonly_fields = ["created_at", "updated_at"]
+    actions = ["approve_applications"]
+
+    def approve_applications(self, request, queryset):
+        for app in queryset.filter(status="pending"):
+            # Approve logic here
+            app.status = "approved"
+            app.save()
+        self.message_user(request, f"Approved {queryset.count()} applications")
+    approve_applications.short_description = "Approve selected applications"

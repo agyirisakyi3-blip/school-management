@@ -49,4 +49,10 @@ urlpatterns = [
         views.AcademicYearCreateView.as_view(),
         name="academic_year_create",
     ),
+    # Online Admission - access via students/admission/
+    path("admission/", views.AdmissionFormView.as_view(), name="admission_form"),
+    path("admission/submit/", views.AdmissionSubmitView.as_view(), name="admission_submit"),
+    path("admissions/", views.AdmissionListView.as_view(), name="admission_list"),
+    path("admissions/<int:pk>/", views.AdmissionDetailView.as_view(), name="admission_detail"),
+    path("admissions/<int:pk>/approve/", views.AdmissionApproveView.as_view(), name="admission_approve"),
 ]

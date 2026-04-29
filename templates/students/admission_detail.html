@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Application Details - SchoolMS{% endblock %}
+
+{% block page_title %}Admission Application Details{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Personal Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted">Full Name</label>
+                        <p class="mb-0 fw-bold">{{ application.full_name }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted">Date of Birth</label>
+                        <p class="mb-0">{{ application.date_of_birth }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted">Gender</label>
+                        <p class="mb-0 text-capitalize">{{ application.gender }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted">Email</label>
+                        <p class="mb-0">{{ application.email }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted">Phone</label>
+                        <p class="mb-0">{{ application.phone }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Guardian Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted">Guardian Name</label>
+                        <p class="mb-0">{{ application.guardian_name }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted">Relationship</label>
+                        <p class="mb-0">{{ application.guardian_relation }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted">Phone</label>
+                        <p class="mb-0">{{ application.guardian_phone }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted">Email</label>
+                        <p class="mb-0">{{ application.guardian_email|default:"-" }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted">Occupation</label>
+                        <p class="mb-0">{{ application.guardian_occupation|default:"-" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Academic Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted">Current School</label>
+                        <p class="mb-0">{{ application.current_school|default:"-" }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted">Current Class</label>
+                        <p class="mb-0">{{ application.current_class|default:"-" }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted">Grade Level</label>
+                        <p class="mb-0">{{ application.grade_level }}</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="text-muted">Applied Class</label>
+                        <p class="mb-0">{{ application.applied_for_class.name|default:"-" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Address</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">{{ application.address }}<br>
+                {{ application.city }}, {{ application.state }} {{ application.postal_code }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Application Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    {% if application.status == 'pending' %}
+                    <span class="badge bg-warning fs-6">Pending</span>
+                    {% elif application.status == 'approved' %}
+                    <span class="badge bg-success fs-6">Approved</span>
+                    {% elif application.status == 'rejected' %}
+                    <span class="badge bg-danger fs-6">Rejected</span>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="text-muted">Applied Date</label>
+                    <p class="mb-0">{{ application.created_at|date:"F d, Y" }}</p>
+                </div>
+
+                {% if application.assigned_student %}
+                <div class="mb-3">
+                    <label class="text-muted">Student ID</label>
+                    <p class="mb-0 fw-bold">{{ application.assigned_student.student_id }}</p>
+                </div>
+                {% endif %}
+
+                {% if application.status == 'pending' %}
+                <form method="post" action="{% url 'students:admission_approve' application.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="bi bi-check-lg me-2"></i>Approve & Create Student
+                    </button>
+                </form>
+                {% endif %}
+
+                <hr>
+                <a href="{% url 'students:admission_list' %}" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-arrow-left me-2"></i>Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

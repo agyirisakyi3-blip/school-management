@@ -222,7 +222,7 @@ class NonTeachingStaff(models.Model):
                 try:
                     num = int(last_staff.staff_id.replace("STAFF", ""))
                     self.staff_id = f"STAFF{str(num + 1).zfill(5)}"
-                except:
+                except (ValueError, TypeError):
                     self.staff_id = "STAFF00001"
             else:
                 self.staff_id = "STAFF00001"

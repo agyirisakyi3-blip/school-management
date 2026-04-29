@@ -4,7 +4,7 @@
 {% block title %}Login - School Management System{% endblock %}
 
 {% block auth_content %}
-<div class="login-page">
+<div class="login-page" data-bs-theme="light">
     <!-- Left Side - Branding & Features -->
     <div class="login-brand">
         <div class="brand-content">
@@ -30,8 +30,8 @@
             <!-- Feature Cards -->
             <div class="features-grid">
                 <div class="feature-card">
-                    <div class="feature-icon bg-primary-subtle">
-                        <i class="bi bi-people text-primary"></i>
+                    <div class="feature-icon" style="background: rgba(21, 101, 192, 0.15); color: #1565c0;">
+                        <i class="bi bi-people"></i>
                     </div>
                     <div>
                         <h5>Student Management</h5>
@@ -39,8 +39,8 @@
                     </div>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon bg-success-subtle">
-                        <i class="bi bi-currency-dollar text-success"></i>
+                    <div class="feature-icon" style="background: rgba(0, 137, 123, 0.15); color: #00897b;">
+                        <i class="bi bi-currency-dollar"></i>
                     </div>
                     <div>
                         <h5>Fee Management</h5>
@@ -48,8 +48,8 @@
                     </div>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon bg-warning-subtle">
-                        <i class="bi bi-journal-text text-warning"></i>
+                    <div class="feature-icon" style="background: rgba(255, 143, 0, 0.15); color: #ff8f00;">
+                        <i class="bi bi-journal-text"></i>
                     </div>
                     <div>
                         <h5>Academic Planning</h5>
@@ -57,8 +57,8 @@
                     </div>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon bg-info-subtle">
-                        <i class="bi bi-bell text-info"></i>
+                    <div class="feature-icon" style="background: rgba(13, 202, 240, 0.15); color: #0dcaf0;">
+                        <i class="bi bi-bell"></i>
                     </div>
                     <div>
                         <h5>Communication</h5>
@@ -104,7 +104,7 @@
             </div>
             {% endif %}
 
-            <form method="post" class="login-form">
+            <form method="post" action="{% url 'users:login' %}" class="login-form">
                 {% csrf_token %}
                 
                 <div class="form-group mb-4">
@@ -146,7 +146,7 @@
             <!-- Demo Credentials -->
             <div class="demo-box mt-4">
                 <div class="d-flex align-items-center gap-2 mb-2">
-                    <i class="bi bi-info-circle text-info"></i>
+                    <i class="bi bi-info-circle" style="color: #0dcaf0;"></i>
                     <span class="fw-semibold">Demo Credentials</span>
                 </div>
                 <div class="d-flex gap-3 flex-wrap">
@@ -179,7 +179,7 @@
 
     .login-brand {
         flex: 1;
-        background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%);
+        background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
         padding: 3rem;
         display: flex;
         align-items: center;
@@ -202,7 +202,7 @@
     }
 
     .brand-logo i {
-        color: #fbbf24;
+        color: #ffc107;
     }
 
     .feature-card {
@@ -253,8 +253,8 @@
     }
 
     .form-control:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        border-color: #1565c0;
+        box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
     }
 
     .input-group-text {
@@ -271,16 +271,17 @@
         padding: 0.875rem;
         border-radius: 10px;
         font-weight: 600;
+        background: #1565c0;
         transition: all 0.2s;
     }
 
     .btn-login:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3);
     }
 
     .demo-box {
-        background: #eff6ff;
+        background: #e3f2fd;
         border-radius: 12px;
         padding: 1rem;
     }

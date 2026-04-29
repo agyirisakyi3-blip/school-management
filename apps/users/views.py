@@ -26,12 +26,18 @@ from .forms import NonTeachingStaffCreationForm, NonTeachingStaffForm
 class HomeView(TemplateView):
     """Home page view."""
 
-    template_name = "home.html"
+    template_name = "users/login.html"
 
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
+            if request.user.is_superuser or request.user.role in [
+                "admin",
+                "principal",
+                "vice_principal",
+            ]:
+                return redirect("users:admin_dashboard")
             return redirect("users:dashboard")
-        return redirect("users:login")
+        return super().get(request, *args, **kwargs)
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -42,6 +48,16 @@ class DashboardView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
+
+        # Welcome banner data
+        context["today_date"] = datetime.now()
+        hour = datetime.now().hour
+        if hour < 12:
+            context["greeting"] = "Morning"
+        elif hour < 17:
+            context["greeting"] = "Afternoon"
+        else:
+            context["greeting"] = "Evening"
 
         if user.is_admin_user:
             context["total_students"] = Student.objects.filter(is_active=True).count()
@@ -118,13 +134,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 context["student_results"] = Result.objects.filter(
                     student=student
                 ).select_related("exam_schedule__subject")
-                if context["student_results"]:
-                    context["average_score"] = round(
-                        context["student_results"].aggregate(avg=Avg("marks_obtained"))[
-                            "avg"
-                        ],
-                        1,
-                    )
+                avg_result = context["student_results"].aggregate(avg=Avg("marks_obtained"))
+                if avg_result["avg"]:
+                    context["average_score"] = round(avg_result["avg"], 1)
                 context["upcoming_exams"] = Exam.objects.filter(
                     start_date__gte=datetime.now().date()
                 ).count()
@@ -172,12 +184,13 @@ class AdminDashboardView(LoginRequiredMixin, TemplateView):
         context["total_fees_collected"] = (
             StudentFee.objects.aggregate(total=Sum("amount_paid"))["total"] or 0
         )
-        context["total_fees_pending"] = (
-            StudentFee.objects.filter(
-                status__in=["pending", "partial", "overdue"]
-            ).aggregate(total=Sum("amount") - Sum("amount_paid"))["total"]
-            or 0
-        )
+        total_amount = StudentFee.objects.filter(
+            status__in=["pending", "partial", "overdue"]
+        ).aggregate(total=Sum("amount"))["total"] or 0
+        total_paid = StudentFee.objects.filter(
+            status__in=["pending", "partial", "overdue"]
+        ).aggregate(total=Sum("amount_paid"))["total"] or 0
+        context["total_fees_pending"] = total_amount - total_paid
         context["monthly_collections"] = (
             Payment.objects.filter(payment_date__month=datetime.now().month).aggregate(
                 total=Sum("amount")
@@ -730,14 +743,7 @@ class ProfileUpdateView(LoginRequiredMixin, TemplateView):
         return render(request, self.template_name, {"form": form})
 
 
-class AdminRequiredMixin:
-    """Mixin to check if user is admin."""
-
-    def test_func(self):
-        return self.request.user.is_admin_user
-
-
-class NonTeachingStaffListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
+class NonTeachingStaffListView(AdminRequiredMixin, ListView):
     """List all non-teaching staff."""
 
     model = NonTeachingStaff
@@ -769,7 +775,7 @@ class NonTeachingStaffListView(LoginRequiredMixin, AdminRequiredMixin, ListView)
         return context
 
 
-class NonTeachingStaffCreateView(LoginRequiredMixin, AdminRequiredMixin, TemplateView):
+class NonTeachingStaffCreateView(AdminRequiredMixin, TemplateView):
     """Create new non-teaching staff."""
 
     template_name = "users/staff_create.html"
@@ -811,7 +817,7 @@ class NonTeachingStaffDetailView(LoginRequiredMixin, DetailView):
         return NonTeachingStaff.objects.select_related("user")
 
 
-class NonTeachingStaffUpdateView(LoginRequiredMixin, AdminRequiredMixin, TemplateView):
+class NonTeachingStaffUpdateView(AdminRequiredMixin, TemplateView):
     """Update non-teaching staff."""
 
     template_name = "users/staff_update.html"
@@ -840,6 +846,3 @@ class NonTeachingStaffUpdateView(LoginRequiredMixin, AdminRequiredMixin, Templat
             messages.success(request, "Staff member updated successfully!")
             return redirect("users:staff_detail", pk=pk)
         return render(request, self.template_name, {"form": form, "staff": staff})
-
-
-from django.shortcuts import get_object_or_404

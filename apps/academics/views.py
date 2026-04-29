@@ -37,7 +37,7 @@ from .forms import (
 from ..students.models import Student, Class
 
 
-class AdminRequiredMixin(UserPassesTestMixin):
+class TeacherRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         return self.request.user.is_admin_user or self.request.user.is_teacher
 
@@ -155,7 +155,7 @@ class AttendanceCalendarView(LoginRequiredMixin, TemplateView):
         return days
 
 
-class AttendanceCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
+class AttendanceCreateView(LoginRequiredMixin, TeacherRequiredMixin, CreateView):
     model = Attendance
     form_class = AttendanceForm
     template_name = "academics/attendance_form.html"
@@ -167,7 +167,7 @@ class AttendanceCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class AttendanceBulkCreateView(LoginRequiredMixin, AdminRequiredMixin, View):
+class AttendanceBulkCreateView(LoginRequiredMixin, TeacherRequiredMixin, View):
     template_name = "academics/attendance_bulk_form.html"
     success_url = reverse_lazy("academics:attendance_list")
 
@@ -253,7 +253,7 @@ class ExamDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class ExamCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
+class ExamCreateView(LoginRequiredMixin, TeacherRequiredMixin, CreateView):
     model = Exam
     form_class = ExamForm
     template_name = "academics/exam_form.html"
@@ -264,7 +264,7 @@ class ExamCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class ExamScheduleCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
+class ExamScheduleCreateView(LoginRequiredMixin, TeacherRequiredMixin, CreateView):
     model = ExamSchedule
     form_class = ExamScheduleForm
     template_name = "academics/exam_schedule_form.html"
@@ -302,7 +302,7 @@ class ResultListView(LoginRequiredMixin, ListView):
         return queryset
 
 
-class ResultCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
+class ResultCreateView(LoginRequiredMixin, TeacherRequiredMixin, CreateView):
     model = Result
     form_class = ResultForm
     template_name = "academics/result_form.html"
@@ -336,7 +336,7 @@ class TimetableListView(LoginRequiredMixin, ListView):
         return queryset.order_by("day", "start_time")
 
 
-class TimetableCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
+class TimetableCreateView(LoginRequiredMixin, TeacherRequiredMixin, CreateView):
     model = Timetable
     form_class = TimetableForm
     template_name = "academics/timetable_form.html"
@@ -621,6 +621,8 @@ class OnlineExamListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         student = self.request.user.student_profile
+        if not student:
+            return ExamSchedule.objects.none()
         from django.utils import timezone
 
         now = timezone.now()
@@ -633,6 +635,8 @@ class OnlineExamListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         student = self.request.user.student_profile
+        if not student:
+            return context
         context["completed_exams"] = StudentExam.objects.filter(
             student=student, is_submitted=True
         ).values_list("exam_schedule_id", flat=True)
